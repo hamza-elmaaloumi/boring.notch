@@ -9,6 +9,8 @@ struct ProductivityRootView: View {
                 WaterTrackerView()
             }
             .padding()
+            .padding(.top, 20)
+            .padding(.bottom, 10)
         }
         .frame(maxHeight: 400)
     }

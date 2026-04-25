@@ -59,9 +59,6 @@ struct ShelfItemView: View {
                         .padding(4)
                     }
                 }
-                .onHover { state in
-                    isHovering = state
-                }
 
                 DraggableClickHandler(
                     item: item,
@@ -77,10 +74,13 @@ struct ShelfItemView: View {
                 )
             } else {
                 Color.clear
-                    .frame(width: 105)
-                    .padding(.vertical, 10)
-                    .padding(.horizontal, 5)
+                    .frame(width: 80)
+                    .padding(.vertical, 4)
+                    .padding(.horizontal, 4)
             }
+        }
+        .onHover { state in
+            isHovering = state
         }
         .onChange(of: viewModel.isDropTargeted) { _, targeted in
             vm.dragDetectorTargeting = targeted

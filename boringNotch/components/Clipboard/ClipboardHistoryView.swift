@@ -22,13 +22,14 @@ struct ClipboardHistoryView: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
-                .padding(.vertical, 8)
+                .padding(.vertical, 4)
                 .padding(.horizontal, 12)
                 .background(Color(red: 50.0/255.0, green: 50.0/255.0, blue: 50.0/255.0))
                 .cornerRadius(8)
             }
             .buttonStyle(PlainButtonStyle())
-            .padding([.horizontal, .top])
+            .padding(.horizontal)
+            .padding(.top, 4)
             
             ScrollView {
                 LazyVStack(spacing: 0) {

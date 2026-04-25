@@ -9,11 +9,17 @@ struct PomodoroTimerView: View {
         case focus = "Focus"
         case shortBreak = "Short Break"
         case longBreak = "Long Break"
+        
+        var iconName: String {
+            switch self {
+            case .focus: return "brain"
+            case .shortBreak: return "cup.and.saucer.fill"
+            case .longBreak: return "bed.double.fill"
+            }
+        }
     }
     
-    @State private var currentMode: Mode = .focus {
-        didSet { resetTimer() }
-    }
+    @State private var currentMode: Mode = .focus
     
     @State private var timeRemaining: Int = 25 * 60
     @State private var timer: Timer?
@@ -29,11 +35,14 @@ struct PomodoroTimerView: View {
         VStack(spacing: 12) {
             Picker("Mode", selection: $currentMode) {
                 ForEach(Mode.allCases, id: \.self) { mode in
-                    Text(mode.rawValue).tag(mode)
+                    Image(systemName: mode.iconName).tag(mode)
                 }
             }
             .pickerStyle(SegmentedPickerStyle())
             .padding(.horizontal, 10)
+            .onChange(of: currentMode) { _ in
+                resetTimer()
+            }
             
             Text(currentMode.rawValue)
                 .font(.headline)

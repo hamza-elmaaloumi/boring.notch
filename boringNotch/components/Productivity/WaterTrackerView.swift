@@ -47,9 +47,6 @@ struct WaterTrackerView: View {
             }
             .frame(height: 80)
             
-            Text("\(waterConsumed) / \(waterGoal) \(waterUnit)")
-                .font(.callout)
-            
             HStack(spacing: 15) {
                 Button(action: decrementWater) {
                     Image(systemName: "minus.circle.fill")
@@ -57,6 +54,10 @@ struct WaterTrackerView: View {
                         .foregroundColor(.gray)
                 }
                 .buttonStyle(PlainButtonStyle())
+                
+                Text("\(waterConsumed) / \(waterGoal) \(waterUnit)")
+                    .font(.callout)
+                    .frame(minWidth: 80)
                 
                 Button(action: incrementWater) {
                     Image(systemName: "plus.circle.fill")

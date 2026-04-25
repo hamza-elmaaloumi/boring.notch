@@ -67,6 +67,18 @@ struct ProductivitySettingsView: View {
                                 Text("cups").tag("cups")
                             }
                             .frame(width: 100)
+                            .onChange(of: waterUnit) { unit in
+                                if unit == "cups" {
+                                    waterGoal = 8
+                                    waterIncrement = 1
+                                } else if unit == "ml" {
+                                    waterGoal = 2000
+                                    waterIncrement = 250
+                                } else if unit == "oz" {
+                                    waterGoal = 64
+                                    waterIncrement = 8
+                                }
+                            }
                         }
                     }
                     .padding()
