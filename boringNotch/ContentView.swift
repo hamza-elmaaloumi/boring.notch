@@ -167,6 +167,12 @@ struct ContentView: View {
                             }
                         }
                     }
+                    .onChange(of: coordinator.currentView) { _, _ in
+                        guard vm.notchState == .open else { return }
+                        withAnimation(.smooth(duration: 0.25)) {
+                            vm.updateOpenNotchSizeForCurrentView()
+                        }
+                    }
                     .onChange(of: vm.isBatteryPopoverActive) {
                         if !vm.isBatteryPopoverActive && !isHovering && vm.notchState == .open && !SharingStateManager.shared.preventNotchClose {
                             hoverTask?.cancel()
