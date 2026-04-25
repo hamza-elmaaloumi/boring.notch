@@ -10,7 +10,7 @@ struct ProductivityRootView: View {
             }
             .padding(.horizontal, 12)
             .padding(.top, 6)
-            .padding(.bottom, 14)
+            .padding(.bottom, 16)
         }
         .frame(maxWidth: .infinity, alignment: .top)
     }

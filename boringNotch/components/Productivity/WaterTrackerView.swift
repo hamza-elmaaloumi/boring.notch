@@ -38,7 +38,7 @@ struct WaterTrackerView: View {
     }
 
     var body: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: 8) {
             Text("Hydration")
                 .font(.headline)
                 .foregroundColor(.blue)
@@ -93,23 +93,23 @@ struct WaterTrackerView: View {
                     .animation(.spring(response: 0.45, dampingFraction: 0.82), value: fillPercentage)
                 }
             }
-            .frame(width: 102, height: 126)
+            .frame(width: 82, height: 102)
 
-            HStack(spacing: 12) {
+            HStack(spacing: 10) {
                 Button(action: decrementWater) {
                     Image(systemName: "minus.circle.fill")
-                        .font(.system(size: 20, weight: .semibold))
+                        .font(.system(size: 17, weight: .semibold))
                         .foregroundColor(.gray)
                 }
                 .buttonStyle(PlainButtonStyle())
 
                 Text(progressText)
                     .font(.callout.weight(.semibold))
-                    .frame(minWidth: 88)
+                    .frame(minWidth: 78)
 
                 Button(action: incrementWater) {
                     Image(systemName: "plus.circle.fill")
-                        .font(.system(size: 20, weight: .semibold))
+                        .font(.system(size: 17, weight: .semibold))
                         .foregroundColor(.blue)
                 }
                 .buttonStyle(PlainButtonStyle())
