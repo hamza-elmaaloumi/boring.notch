@@ -39,6 +39,7 @@ enum HideNotchOption: String, Defaults.Serializable {
 // Define notification names at file scope
 extension Notification.Name {
     static let mediaControllerChanged = Notification.Name("mediaControllerChanged")
+    static let pomodoroTimerFinished = Notification.Name("pomodoroTimerFinished")
 }
 
 // Media controller types for selection in settings

@@ -160,17 +160,18 @@ struct ContentView: View {
                             }
                         }
                     }
+                    .onReceive(NotificationCenter.default.publisher(for: .pomodoroTimerFinished)) { _ in
+                        coordinator.currentView = .productivity
+                        if vm.notchState == .closed {
+                            doOpen()
+                        }
+                        NSApp.activate(ignoringOtherApps: true)
+                    }
                     .onChange(of: vm.notchState) { _, newState in
                         if newState == .closed && isHovering {
                             withAnimation {
                                 isHovering = false
                             }
-                        }
-                    }
-                    .onChange(of: coordinator.currentView) { _, _ in
-                        guard vm.notchState == .open else { return }
-                        withAnimation(.smooth(duration: 0.25)) {
-                            vm.updateOpenNotchSizeForCurrentView()
                         }
                     }
                     .onChange(of: vm.isBatteryPopoverActive) {

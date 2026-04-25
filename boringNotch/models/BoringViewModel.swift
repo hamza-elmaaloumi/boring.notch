@@ -190,25 +190,11 @@ class BoringViewModel: NSObject, ObservableObject {
     }
 
     func open() {
-        self.notchSize = openNotchSize(for: coordinator.currentView)
+        self.notchSize = openNotchSize
         self.notchState = .open
         
         // Force music information update when notch is opened
         MusicManager.shared.forceUpdate()
-    }
-
-    func updateOpenNotchSizeForCurrentView() {
-        guard notchState == .open else { return }
-        notchSize = openNotchSize(for: coordinator.currentView)
-    }
-
-    private func openNotchSize(for view: NotchViews) -> CGSize {
-        switch view {
-        case .productivity:
-            return .init(width: openNotchSize.width, height: productivityOpenNotchHeight)
-        default:
-            return openNotchSize
-        }
     }
 
     func close() {
@@ -222,20 +208,6 @@ class BoringViewModel: NSObject, ObservableObject {
         self.isBatteryPopoverActive = false
         self.coordinator.sneakPeek.show = false
         self.edgeAutoOpenActive = false
-
-        // Set the current view to shelf if it contains files and the user enables openShelfByDefault
-        // Otherwise, if the user has not enabled openLastShelfByDefault, set the view to home
-    if !ShelfStateViewModel.shared.isEmpty && Defaults[.openShelfByDefault] {
-            coordinator.currentView = .shelf
-        } else if !coordinator.openLastTabByDefault {
-            let defaultTabStr = UserDefaults.standard.string(forKey: "defaultTab") ?? "home"
-            switch defaultTabStr {
-            case "shelf": coordinator.currentView = .shelf
-            case "clipboard": coordinator.currentView = .clipboard
-            case "productivity": coordinator.currentView = .productivity
-            default: coordinator.currentView = .home
-            }
-        }
     }
 
     func closeHello() {
