@@ -27,6 +27,10 @@ final class ShelfStateViewModel: ObservableObject {
         items = ShelfPersistenceService.shared.load()
     }
 
+    func removeItem(at index: Int) {
+        guard items.indices.contains(index) else { return }
+        items.remove(at: index)
+    }
 
     func add(_ newItems: [ShelfItem]) {
         guard !newItems.isEmpty else { return }

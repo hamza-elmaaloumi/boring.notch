@@ -46,7 +46,7 @@ struct ShelfItemView: View {
                 .overlay(alignment: .topTrailing) {
                     Button(action: {
                         if let idx = ShelfStateViewModel.shared.items.firstIndex(where: { $0.id == item.id }) {
-                            ShelfStateViewModel.shared.items.remove(at: idx)
+                            ShelfStateViewModel.shared.removeItem(at: idx)
                         }
                     }) {
                         Image(systemName: "xmark.circle.fill")
