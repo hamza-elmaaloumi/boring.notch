@@ -32,31 +32,30 @@ struct PomodoroTimerView: View {
     }
     
     var body: some View {
-        VStack(spacing: 12) {
-            Picker("Mode", selection: $currentMode) {
+        VStack(spacing: 8) {
+            Picker("", selection: $currentMode) {
                 ForEach(Mode.allCases, id: \.self) { mode in
                     Image(systemName: mode.iconName).tag(mode)
                 }
             }
+            .labelsHidden()
             .pickerStyle(SegmentedPickerStyle())
             .padding(.horizontal, 10)
-            .onChange(of: currentMode) { _ in
+            .frame(maxWidth: 210)
+            .frame(maxWidth: .infinity)
+            .onChange(of: currentMode) { _, _ in
                 resetTimer()
             }
             
-            Text(currentMode.rawValue)
-                .font(.headline)
-                .foregroundColor(currentMode == .focus ? .red : .green)
-            
             Text(timeString)
-                .font(.system(size: 40, weight: .bold, design: .monospaced))
+                .font(.system(size: 34, weight: .bold, design: .monospaced))
                 .monospacedDigit()
             
-            HStack(spacing: 20) {
+            HStack(spacing: 14) {
                 Button(action: toggleTimer) {
                     Image(systemName: isRunning ? "pause.fill" : "play.fill")
-                        .font(.title2)
-                        .frame(width: 44, height: 44)
+                        .font(.system(size: 16, weight: .semibold))
+                        .frame(width: 38, height: 38)
                         .background(Color.white.opacity(0.1))
                         .clipShape(Circle())
                 }
@@ -64,8 +63,8 @@ struct PomodoroTimerView: View {
                 
                 Button(action: resetTimer) {
                     Image(systemName: "arrow.counterclockwise")
-                        .font(.title2)
-                        .frame(width: 44, height: 44)
+                        .font(.system(size: 16, weight: .semibold))
+                        .frame(width: 38, height: 38)
                         .background(Color.white.opacity(0.1))
                         .clipShape(Circle())
                 }
@@ -75,6 +74,21 @@ struct PomodoroTimerView: View {
         .frame(maxWidth: .infinity)
         .onAppear {
             timeRemaining = modeDuration(for: currentMode) * 60
+        }
+        .onChange(of: pomodoroFocus) { _, _ in
+            if currentMode == .focus {
+                resetTimer()
+            }
+        }
+        .onChange(of: pomodoroShortBreak) { _, _ in
+            if currentMode == .shortBreak {
+                resetTimer()
+            }
+        }
+        .onChange(of: pomodoroLongBreak) { _, _ in
+            if currentMode == .longBreak {
+                resetTimer()
+            }
         }
     }
     

@@ -6,7 +6,7 @@ struct ProductivitySettingsView: View {
     @AppStorage("pomodoroLongBreak") private var pomodoroLongBreak: Int = 15
     
     @AppStorage("waterGoal") private var waterGoal: Int = 2000
-    @AppStorage("waterIncrement") private var waterIncrement: Int = 250
+    @AppStorage("waterIncrement") private var waterIncrement: Int = 200
     @AppStorage("waterUnit") private var waterUnit: String = "ml"
 
     var body: some View {
@@ -63,20 +63,16 @@ struct ProductivitySettingsView: View {
                             Spacer()
                             Picker("", selection: $waterUnit) {
                                 Text("ml").tag("ml")
-                                Text("oz").tag("oz")
                                 Text("cups").tag("cups")
                             }
                             .frame(width: 100)
-                            .onChange(of: waterUnit) { unit in
+                            .onChange(of: waterUnit) { _, unit in
                                 if unit == "cups" {
                                     waterGoal = 8
                                     waterIncrement = 1
-                                } else if unit == "ml" {
+                                } else {
                                     waterGoal = 2000
-                                    waterIncrement = 250
-                                } else if unit == "oz" {
-                                    waterGoal = 64
-                                    waterIncrement = 8
+                                    waterIncrement = 200
                                 }
                             }
                         }
@@ -87,6 +83,13 @@ struct ProductivitySettingsView: View {
                 Spacer()
             }
             .padding(30)
+        }
+        .onAppear {
+            if waterUnit != "ml" && waterUnit != "cups" {
+                waterUnit = "ml"
+                waterGoal = 2000
+                waterIncrement = 200
+            }
         }
     }
 }

@@ -31,35 +31,8 @@ struct ShelfItemView: View {
     }
 
     var body: some View {
-        ZStack {
+        ZStack(alignment: .topTrailing) {
             if !shouldHideDuringDrag {
-                VStack(alignment: .center, spacing: 2) {
-                    iconView
-                    textView
-                }
-                .frame(width: 80)
-                .padding(.vertical, 4)
-                .padding(.horizontal, 4)
-                .background(backgroundView)
-                .contentShape(Rectangle())
-                .animation(.easeInOut(duration: 0.1), value: debouncedDropTarget)
-                .animation(.easeInOut(duration: 0.1), value: isSelected)
-                .overlay(alignment: .topTrailing) {
-                    if isHovering {
-                        Button(action: {
-                            if let idx = ShelfStateViewModel.shared.items.firstIndex(where: { $0.id == item.id }) {
-                                ShelfStateViewModel.shared.removeItem(at: idx)
-                            }
-                        }) {
-                            Image(systemName: "xmark.circle.fill")
-                                .foregroundColor(.red)
-                                .background(Circle().fill(Color.white).padding(2))
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                        .padding(4)
-                    }
-                }
-
                 DraggableClickHandler(
                     item: item,
                     viewModel: viewModel,
@@ -72,13 +45,43 @@ struct ShelfItemView: View {
                         viewModel.handleClick(event: event, view: nsview)
                     }
                 )
+                .frame(width: 80)
+                .padding(.vertical, 4)
+                .padding(.horizontal, 4)
+
+                VStack(alignment: .center, spacing: 2) {
+                    iconView
+                    textView
+                }
+                .frame(width: 80)
+                .padding(.vertical, 4)
+                .padding(.horizontal, 4)
+                .background(backgroundView)
+                .contentShape(Rectangle())
+                .allowsHitTesting(false)
+                .animation(.easeInOut(duration: 0.1), value: debouncedDropTarget)
+                .animation(.easeInOut(duration: 0.1), value: isSelected)
             } else {
                 Color.clear
                     .frame(width: 80)
                     .padding(.vertical, 4)
                     .padding(.horizontal, 4)
             }
+
+            if !shouldHideDuringDrag && isHovering {
+                Button(action: {
+                    ShelfStateViewModel.shared.remove(item)
+                }) {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundColor(.red)
+                        .background(Circle().fill(Color.white).padding(2))
+                }
+                .buttonStyle(PlainButtonStyle())
+                .padding(4)
+                .zIndex(5)
+            }
         }
+        .contentShape(Rectangle())
         .onHover { state in
             isHovering = state
         }
