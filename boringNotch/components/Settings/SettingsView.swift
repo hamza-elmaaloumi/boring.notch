@@ -48,6 +48,9 @@ struct SettingsView: View {
                 NavigationLink(value: "Snippets") {
                     Label("Snippets", systemImage: "doc.text")
                 }
+                NavigationLink(value: "Productivity") {
+                    Label("Productivity", systemImage: "timer")
+                }
 //                NavigationLink(value: "Downloads") {
 //                    Label("Downloads", systemImage: "square.and.arrow.down")
 //                }
@@ -88,6 +91,8 @@ struct SettingsView: View {
                     Charge()
                 case "Snippets":
                     SnippetsSettingsView()
+                case "Productivity":
+                    ProductivitySettingsView()
                 case "Shelf":
                     Shelf()
                 case "Shortcuts":

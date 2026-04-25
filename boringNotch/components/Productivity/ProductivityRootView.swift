@@ -2,12 +2,14 @@ import SwiftUI
 
 struct ProductivityRootView: View {
     var body: some View {
-        HStack(spacing: 20) {
-            PomodoroTimerView()
-            Divider()
-            WaterTrackerView()
+        VStack {
+            HStack(spacing: 20) {
+                PomodoroTimerView()
+                Divider()
+                WaterTrackerView()
+            }
+            .padding()
         }
-        .padding()
-        .frame(height: 200)
+        .frame(maxHeight: 400)
     }
 }

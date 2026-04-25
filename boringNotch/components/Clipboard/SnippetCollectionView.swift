@@ -98,7 +98,9 @@ struct SnippetItemRow: View {
                         .foregroundColor(.secondary)
                 }
             }
-            .padding()
+            .padding(.vertical, 0)
+            .padding(.horizontal, 8)
+            .frame(height: 28)
             .background(Color.white.opacity(0.03))
             .cornerRadius(8)
         }

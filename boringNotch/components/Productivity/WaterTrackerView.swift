@@ -3,11 +3,11 @@ import SwiftUI
 struct WaterTrackerView: View {
     @AppStorage("waterConsumed") private var waterConsumed: Int = 0
     @AppStorage("waterGoal") private var waterGoal: Int = 2000 // default 2 liters
-    
-    private let incrementAmount = 250 // 250ml per glass
+    @AppStorage("waterIncrement") private var waterIncrement: Int = 250 // 250ml per glass
+    @AppStorage("waterUnit") private var waterUnit: String = "ml"
     
     var fillPercentage: Double {
-        return min(Double(waterConsumed) / Double(waterGoal), 1.0)
+        return min(Double(waterConsumed) / Double(max(1, waterGoal)), 1.0)
     }
     
     var body: some View {
@@ -47,7 +47,7 @@ struct WaterTrackerView: View {
             }
             .frame(height: 80)
             
-            Text("\(waterConsumed) / \(waterGoal) ml")
+            Text("\(waterConsumed) / \(waterGoal) \(waterUnit)")
                 .font(.callout)
             
             HStack(spacing: 15) {
@@ -70,10 +70,10 @@ struct WaterTrackerView: View {
     }
     
     private func incrementWater() {
-        waterConsumed += incrementAmount
+        waterConsumed += waterIncrement
     }
     
     private func decrementWater() {
-        waterConsumed = max(0, waterConsumed - incrementAmount)
+        waterConsumed = max(0, waterConsumed - waterIncrement)
     }
 }

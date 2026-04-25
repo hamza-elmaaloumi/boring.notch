@@ -1,10 +1,23 @@
 import SwiftUI
 
 struct PomodoroTimerView: View {
+    @AppStorage("pomodoroFocus") private var pomodoroFocus: Int = 25
+    @AppStorage("pomodoroShortBreak") private var pomodoroShortBreak: Int = 5
+    @AppStorage("pomodoroLongBreak") private var pomodoroLongBreak: Int = 15
+    
+    enum Mode: String, CaseIterable {
+        case focus = "Focus"
+        case shortBreak = "Short Break"
+        case longBreak = "Long Break"
+    }
+    
+    @State private var currentMode: Mode = .focus {
+        didSet { resetTimer() }
+    }
+    
     @State private var timeRemaining: Int = 25 * 60
     @State private var timer: Timer?
     @State private var isRunning: Bool = false
-    @State private var isWorkSession: Bool = true
     
     var timeString: String {
         let minutes = timeRemaining / 60
@@ -13,10 +26,18 @@ struct PomodoroTimerView: View {
     }
     
     var body: some View {
-        VStack(spacing: 15) {
-            Text(isWorkSession ? "Focus" : "Break")
+        VStack(spacing: 12) {
+            Picker("Mode", selection: $currentMode) {
+                ForEach(Mode.allCases, id: \.self) { mode in
+                    Text(mode.rawValue).tag(mode)
+                }
+            }
+            .pickerStyle(SegmentedPickerStyle())
+            .padding(.horizontal, 10)
+            
+            Text(currentMode.rawValue)
                 .font(.headline)
-                .foregroundColor(isWorkSession ? .red : .green)
+                .foregroundColor(currentMode == .focus ? .red : .green)
             
             Text(timeString)
                 .font(.system(size: 40, weight: .bold, design: .monospaced))
@@ -43,6 +64,17 @@ struct PomodoroTimerView: View {
             }
         }
         .frame(maxWidth: .infinity)
+        .onAppear {
+            timeRemaining = modeDuration(for: currentMode) * 60
+        }
+    }
+    
+    private func modeDuration(for mode: Mode) -> Int {
+        switch mode {
+        case .focus: return pomodoroFocus
+        case .shortBreak: return pomodoroShortBreak
+        case .longBreak: return pomodoroLongBreak
+        }
     }
     
     private func toggleTimer() {
@@ -56,18 +88,24 @@ struct PomodoroTimerView: View {
                     timeRemaining -= 1
                 } else {
                     playAlarm()
-                    isWorkSession.toggle()
-                    timeRemaining = isWorkSession ? 25 * 60 : 5 * 60
+                    switchModeAutomatically()
                 }
             }
+        }
+    }
+    
+    private func switchModeAutomatically() {
+        if currentMode == .focus {
+            currentMode = .shortBreak
+        } else {
+            currentMode = .focus
         }
     }
     
     private func resetTimer() {
         timer?.invalidate()
         isRunning = false
-        isWorkSession = true
-        timeRemaining = 25 * 60
+        timeRemaining = modeDuration(for: currentMode) * 60
     }
     
     private func playAlarm() {

@@ -7,7 +7,8 @@ target = project.targets.find { |t| t.name == 'boringNotch' } || project.targets
 files = [
   'boringNotch/components/Productivity/ProductivityRootView.swift',
   'boringNotch/components/Productivity/PomodoroTimerView.swift',
-  'boringNotch/components/Productivity/WaterTrackerView.swift'
+  'boringNotch/components/Productivity/WaterTrackerView.swift',
+  'boringNotch/components/Settings/ProductivitySettingsView.swift'
 ]
 
 files.each do |fpath|

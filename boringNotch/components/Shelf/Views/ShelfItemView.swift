@@ -20,6 +20,7 @@ struct ShelfItemView: View {
     @State private var showStack = false
     @State private var cachedPreviewImage: NSImage?
     @State private var debouncedDropTarget = false
+    @State private var isHovering = false
 
     private var isSelected: Bool { viewModel.isSelected }
     private var shouldHideDuringDrag: Bool { selection.isDragging && selection.isSelected(item.id) && false }
@@ -36,25 +37,30 @@ struct ShelfItemView: View {
                     iconView
                     textView
                 }
-                .frame(width: 105)
-                .padding(.vertical, 10)
-                .padding(.horizontal, 5)
+                .frame(width: 80)
+                .padding(.vertical, 4)
+                .padding(.horizontal, 4)
                 .background(backgroundView)
                 .contentShape(Rectangle())
                 .animation(.easeInOut(duration: 0.1), value: debouncedDropTarget)
                 .animation(.easeInOut(duration: 0.1), value: isSelected)
                 .overlay(alignment: .topTrailing) {
-                    Button(action: {
-                        if let idx = ShelfStateViewModel.shared.items.firstIndex(where: { $0.id == item.id }) {
-                            ShelfStateViewModel.shared.removeItem(at: idx)
+                    if isHovering {
+                        Button(action: {
+                            if let idx = ShelfStateViewModel.shared.items.firstIndex(where: { $0.id == item.id }) {
+                                ShelfStateViewModel.shared.removeItem(at: idx)
+                            }
+                        }) {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundColor(.red)
+                                .background(Circle().fill(Color.white).padding(2))
                         }
-                    }) {
-                        Image(systemName: "xmark.circle.fill")
-                            .foregroundColor(.red)
-                            .background(Circle().fill(Color.white).padding(2))
+                        .buttonStyle(PlainButtonStyle())
+                        .padding(4)
                     }
-                    .buttonStyle(PlainButtonStyle())
-                    .padding(4)
+                }
+                .onHover { state in
+                    isHovering = state
                 }
 
                 DraggableClickHandler(
