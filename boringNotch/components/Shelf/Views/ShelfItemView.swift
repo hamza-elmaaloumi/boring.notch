@@ -43,6 +43,19 @@ struct ShelfItemView: View {
                 .contentShape(Rectangle())
                 .animation(.easeInOut(duration: 0.1), value: debouncedDropTarget)
                 .animation(.easeInOut(duration: 0.1), value: isSelected)
+                .overlay(alignment: .topTrailing) {
+                    Button(action: {
+                        if let idx = ShelfStateViewModel.shared.items.firstIndex(where: { $0.id == item.id }) {
+                            ShelfStateViewModel.shared.items.remove(at: idx)
+                        }
+                    }) {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundColor(.red)
+                            .background(Circle().fill(Color.white).padding(2))
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    .padding(4)
+                }
 
                 DraggableClickHandler(
                     item: item,

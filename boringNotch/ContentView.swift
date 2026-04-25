@@ -351,6 +351,8 @@ struct ContentView: View {
                         ClipboardRootView()
                     case .shelf:
                         ShelfView()
+                    case .productivity:
+                        ProductivityRootView()
                     }
                 }
                 .transition(

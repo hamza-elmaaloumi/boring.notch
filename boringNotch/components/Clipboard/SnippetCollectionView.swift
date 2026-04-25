@@ -20,15 +20,16 @@ struct SnippetCollectionView: View {
                         .foregroundColor(.primary)
                     Spacer()
                 }
-                .padding()
-                .background(Color.white.opacity(0.05))
+                .padding(.vertical, 8)
+                .padding(.horizontal, 12)
+                .background(Color(red: 50.0/255.0, green: 50.0/255.0, blue: 50.0/255.0))
                 .cornerRadius(8)
             }
             .buttonStyle(PlainButtonStyle())
             .padding([.horizontal, .top])
             
             ScrollView {
-                LazyVStack(spacing: 8) {
+                LazyVStack(spacing: 0) {
                     if clipboardManager.snippets.isEmpty {
                         Text("No snippets saved. Open Settings to add snippets.")
                             .font(.subheadline)

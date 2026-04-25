@@ -153,6 +153,8 @@ struct GeneralSettings: View {
     @Default(.enableGestures) var enableGestures
     @Default(.openNotchOnHover) var openNotchOnHover
     
+    @AppStorage("defaultTab") private var defaultTab: String = "home"
+    
 
     var body: some View {
         Form {
@@ -165,6 +167,12 @@ struct GeneralSettings: View {
                 }
                 .tint(.effectiveAccent)
                 LaunchAtLogin.Toggle("Launch at login")
+                Picker("Default Tab on Startup", selection: $defaultTab) {
+                    Text("Home").tag("home")
+                    Text("File Shelf").tag("shelf")
+                    Text("Clipboard").tag("clipboard")
+                    Text("Productivity").tag("productivity")
+                }
                 Defaults.Toggle(key: .showOnAllDisplays) {
                     Text("Show on all displays")
                 }
@@ -294,7 +302,7 @@ struct GeneralSettings: View {
                 Toggle("Change media with horizontal gestures", isOn: .constant(false))
                     .disabled(true)
                 Defaults.Toggle(key: .closeGestureEnabled) {
-                    Text("Close gesture")
+                    Text("Close Notch on Swipe Up")
                 }
                 Slider(value: $gestureSensitivity, in: 100...300, step: 100) {
                     HStack {

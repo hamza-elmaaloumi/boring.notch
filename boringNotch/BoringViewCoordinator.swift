@@ -66,7 +66,13 @@ class BoringViewCoordinator: ObservableObject {
             if !alwaysShowTabs {
                 openLastTabByDefault = false
                 if ShelfStateViewModel.shared.isEmpty || !Defaults[.openShelfByDefault] {
-                    currentView = .home
+                    let defaultTabStr = UserDefaults.standard.string(forKey: "defaultTab") ?? "home"
+                    switch defaultTabStr {
+                    case "shelf": currentView = .shelf
+                    case "clipboard": currentView = .clipboard
+                    case "productivity": currentView = .productivity
+                    default: currentView = .home
+                    }
                 }
             }
         }

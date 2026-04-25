@@ -108,7 +108,9 @@
 		14E9FEAA2C70BF610062E83F /* DownloadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E9FEA92C70BF610062E83F /* DownloadView.swift */; };
 		14E9FEAE2C7325770062E83F /* Button+Bouncing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E9FEAD2C7325770062E83F /* Button+Bouncing.swift */; };
 		14FC6E502C7DED5600C7BEA5 /* DataTypes+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14FC6E4F2C7DED5600C7BEA5 /* DataTypes+Extensions.swift */; };
+		1787C5CE7F7DF42F3DE92348 /* PomodoroTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBA40637432D3DC44E1D7AB3 /* PomodoroTimerView.swift */; };
 		1BBBC722A7CC8BBDC7153CA6 /* SnippetCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D68B7EB15A26DE6A7FDAE93 /* SnippetCollectionView.swift */; };
+		225540BC68726C91EA34FA31 /* WaterTrackerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D08E65084449AAB6027D6F /* WaterTrackerView.swift */; };
 		46A01D9AC537F69102595376 /* ClipboardManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CAF1CDC377331925FE63392 /* ClipboardManager.swift */; };
 		507266DB2C908E2E00A2D00D /* HoverButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507266DA2C908E2E00A2D00D /* HoverButton.swift */; };
 		5917FD112E57891600E87F1C /* MediaKeyInterceptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5917FD102E57891600E87F1C /* MediaKeyInterceptor.swift */; };
@@ -147,6 +149,7 @@
 		B1F0A0022E60000100000001 /* BrightnessManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1F0A0012E60000100000001 /* BrightnessManager.swift */; };
 		B1F747F92EC7E94000F841DB /* LottieView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1F747F82EC7E94000F841DB /* LottieView.swift */; };
 		B1FEB4992C7686630066EBBC /* PanGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1FEB4982C7686630066EBBC /* PanGesture.swift */; };
+		C14CC4A3D45E32D48A4CF776 /* ProductivityRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 240966195FDF311F479E6083 /* ProductivityRootView.swift */; };
 		C625EE359A64A26E26365FBF /* ClipboardModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = E19ED0F96051027EF39037F8 /* ClipboardModels.swift */; };
 		F38DE6482D8243E7008B5C6D /* BatteryActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F38DE6472D8243E2008B5C6D /* BatteryActivityManager.swift */; };
 /* End PBXBuildFile section */
@@ -187,6 +190,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		04D08E65084449AAB6027D6F /* WaterTrackerView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WaterTrackerView.swift; path = boringNotch/components/Productivity/WaterTrackerView.swift; sourceTree = "<group>"; };
 		1100290B2E847E2800035A57 /* NSItemProvider+LoadHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSItemProvider+LoadHelpers.swift"; sourceTree = "<group>"; };
 		110029262E84FD4C00035A57 /* TemporaryFileStorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemporaryFileStorageService.swift; sourceTree = "<group>"; };
 		110029292E8691B400035A57 /* FileShareView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileShareView.swift; sourceTree = "<group>"; };
@@ -282,6 +286,7 @@
 		14E9FEA92C70BF610062E83F /* DownloadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadView.swift; sourceTree = "<group>"; };
 		14E9FEAD2C7325770062E83F /* Button+Bouncing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Button+Bouncing.swift"; sourceTree = "<group>"; };
 		14FC6E4F2C7DED5600C7BEA5 /* DataTypes+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DataTypes+Extensions.swift"; sourceTree = "<group>"; };
+		240966195FDF311F479E6083 /* ProductivityRootView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ProductivityRootView.swift; path = boringNotch/components/Productivity/ProductivityRootView.swift; sourceTree = "<group>"; };
 		2D68B7EB15A26DE6A7FDAE93 /* SnippetCollectionView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SnippetCollectionView.swift; path = boringNotch/components/Clipboard/SnippetCollectionView.swift; sourceTree = "<group>"; };
 		4CAF1CDC377331925FE63392 /* ClipboardManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ClipboardManager.swift; path = boringNotch/managers/ClipboardManager.swift; sourceTree = "<group>"; };
 		507266DA2C908E2E00A2D00D /* HoverButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoverButton.swift; sourceTree = "<group>"; };
@@ -320,6 +325,7 @@
 		B1FEB4982C7686630066EBBC /* PanGesture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanGesture.swift; sourceTree = "<group>"; };
 		CBB65BA45069529FB1024797 /* ClipboardHistoryView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ClipboardHistoryView.swift; path = boringNotch/components/Clipboard/ClipboardHistoryView.swift; sourceTree = "<group>"; };
 		E19ED0F96051027EF39037F8 /* ClipboardModels.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ClipboardModels.swift; path = boringNotch/models/ClipboardModels.swift; sourceTree = "<group>"; };
+		EBA40637432D3DC44E1D7AB3 /* PomodoroTimerView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PomodoroTimerView.swift; path = boringNotch/components/Productivity/PomodoroTimerView.swift; sourceTree = "<group>"; };
 		F38DE6472D8243E2008B5C6D /* BatteryActivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatteryActivityManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -586,6 +592,9 @@
 				9849E35674C3E6ADCC86FBD8 /* ClipboardRootView.swift */,
 				CBB65BA45069529FB1024797 /* ClipboardHistoryView.swift */,
 				2D68B7EB15A26DE6A7FDAE93 /* SnippetCollectionView.swift */,
+				240966195FDF311F479E6083 /* ProductivityRootView.swift */,
+				EBA40637432D3DC44E1D7AB3 /* PomodoroTimerView.swift */,
+				04D08E65084449AAB6027D6F /* WaterTrackerView.swift */,
 			);
 			sourceTree = "<group>";
 		};
@@ -1071,6 +1080,9 @@
 				10EEAB5EF6139AEB67E17A08 /* ClipboardRootView.swift in Sources */,
 				99052E8592DB3E9C16CC5A84 /* ClipboardHistoryView.swift in Sources */,
 				1BBBC722A7CC8BBDC7153CA6 /* SnippetCollectionView.swift in Sources */,
+				C14CC4A3D45E32D48A4CF776 /* ProductivityRootView.swift in Sources */,
+				1787C5CE7F7DF42F3DE92348 /* PomodoroTimerView.swift in Sources */,
+				225540BC68726C91EA34FA31 /* WaterTrackerView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
