@@ -384,8 +384,9 @@ struct ContentView: View {
                     .font(.system(size: 14, weight: .semibold, design: .monospaced))
                     .monospacedDigit()
                     .foregroundStyle(timerColor)
-                    .frame(width: max(54, CGFloat(timerText.count) * 9), alignment: .leading)
-                    .padding(.leading, 10)
+                    .frame(width: max(72, CGFloat(timerText.count) * 10), alignment: .leading)
+                    .padding(.leading, 4)
+                    .offset(x: -14)
             } else {
                 Rectangle()
                     .fill(.clear)

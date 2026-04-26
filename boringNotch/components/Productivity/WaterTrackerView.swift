@@ -43,7 +43,7 @@ struct WaterTrackerView: View {
                 .font(.headline)
                 .foregroundColor(.blue)
 
-            ZStack(alignment: .bottom) {
+            VStack(spacing: 4) {
                 ZStack {
                     CupShape()
                         .fill(Color.white.opacity(0.06))
@@ -102,44 +102,45 @@ struct WaterTrackerView: View {
                     CupShape()
                         .stroke(Color.white.opacity(0.38), lineWidth: 2)
                 }
-                .frame(width: 78, height: 86)
+                .frame(width: 74, height: 82)
                 .shadow(color: Color.black.opacity(0.18), radius: 8, x: 0, y: 5)
+                .offset(y: -10)
 
-                HStack(spacing: 10) {
+                HStack(spacing: 8) {
                     Button(action: decrementWater) {
                         Image(systemName: "minus")
-                            .font(.system(size: 14, weight: .semibold))
+                            .font(.system(size: 10, weight: .semibold))
                             .foregroundColor(.white)
-                            .frame(width: 24, height: 24)
+                            .frame(width: 16, height: 16)
                             .background(Color.gray.opacity(0.35))
                             .clipShape(Circle())
                     }
                     .buttonStyle(PlainButtonStyle())
 
                     Text(progressText)
-                        .font(.caption.weight(.semibold))
+                        .font(.caption2.weight(.semibold))
                         .monospacedDigit()
                         .foregroundStyle(.white.opacity(0.95))
-                        .frame(minWidth: 84)
+                        .lineLimit(1)
+                        .frame(minWidth: 74)
 
                     Button(action: incrementWater) {
                         Image(systemName: "plus")
-                            .font(.system(size: 14, weight: .semibold))
+                            .font(.system(size: 10, weight: .semibold))
                             .foregroundColor(.white)
-                            .frame(width: 24, height: 24)
+                            .frame(width: 16, height: 16)
                             .background(Color.cyan.opacity(0.95))
                             .clipShape(Circle())
                     }
                     .buttonStyle(PlainButtonStyle())
                 }
-                .padding(.horizontal, 8)
-                .padding(.vertical, 7)
+                .padding(.horizontal, 7)
+                .padding(.vertical, 3)
                 .background(Color.black.opacity(0.18))
                 .clipShape(Capsule())
                 .overlay(
                     Capsule().stroke(Color.white.opacity(0.12), lineWidth: 1)
                 )
-                .offset(y: 10)
             }
             .frame(width: 108, height: 120)
         }
