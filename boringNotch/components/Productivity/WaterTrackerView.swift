@@ -50,45 +50,52 @@ struct WaterTrackerView: View {
 
                     GeometryReader { proxy in
                         let cupHeight = proxy.size.height
-                        let fillHeight = max(6, (cupHeight - 8) * fillPercentage)
+                        let fillHeight = max(0, (cupHeight - 8) * fillPercentage)
+                        let innerCup = CupShape().inset(by: 4)
 
-                        ZStack(alignment: .bottom) {
-                            LinearGradient(
-                                colors: [
-                                    Color.cyan.opacity(0.96),
-                                    Color.blue.opacity(0.84)
-                                ],
-                                startPoint: .top,
-                                endPoint: .bottom
-                            )
+                        VStack(spacing: 0) {
+                            Spacer(minLength: 0)
 
-                            WaterWaveShape(waveHeight: 3.0, phase: wavePhase)
-                                .fill(Color.white.opacity(0.24))
-                                .frame(height: 14)
-                                .offset(y: -1)
+                            ZStack(alignment: .top) {
+                                LinearGradient(
+                                    colors: [
+                                        Color.cyan.opacity(0.96),
+                                        Color.blue.opacity(0.84)
+                                    ],
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                )
 
-                            ZStack {
-                                ForEach(bubbles) { bubble in
-                                    Circle()
-                                        .fill(Color.white.opacity(0.34))
-                                        .frame(width: bubble.size, height: bubble.size)
-                                        .offset(
-                                            x: bubble.x,
-                                            y: animateBubbles ? -bubble.travel : bubble.travel
-                                        )
-                                        .animation(
-                                            .easeInOut(duration: bubble.duration)
-                                                .repeatForever(autoreverses: true)
-                                                .delay(bubble.delay),
-                                            value: animateBubbles
-                                        )
+                                WaterWaveShape(waveHeight: 3.0, phase: wavePhase)
+                                    .fill(Color.white.opacity(0.24))
+                                    .frame(height: 14)
+                                    .offset(y: -6)
+
+                                ZStack {
+                                    ForEach(bubbles) { bubble in
+                                        Circle()
+                                            .fill(Color.white.opacity(0.34))
+                                            .frame(width: bubble.size, height: bubble.size)
+                                            .offset(
+                                                x: bubble.x,
+                                                y: animateBubbles ? -bubble.travel : 0
+                                            )
+                                            .animation(
+                                                .easeInOut(duration: bubble.duration)
+                                                    .repeatForever(autoreverses: true)
+                                                    .delay(bubble.delay),
+                                                value: animateBubbles
+                                            )
+                                    }
                                 }
+                                .padding(.top, 10)
+                                .opacity(fillPercentage > 0.05 ? 1 : 0)
                             }
-                            .opacity(fillPercentage > 0.05 ? 1 : 0)
+                            .frame(width: proxy.size.width, height: fillHeight, alignment: .top)
+                            .clipped()
                         }
-                        .frame(width: proxy.size.width - 8, height: fillHeight, alignment: .bottom)
-                        .clipShape(CupShape())
-                        .offset(x: 4, y: 4)
+                        .frame(width: proxy.size.width, height: cupHeight, alignment: .bottom)
+                        .clipShape(innerCup)
                         .animation(.spring(response: 0.42, dampingFraction: 0.84), value: fillPercentage)
                     }
 
@@ -158,27 +165,56 @@ struct WaterTrackerView: View {
     }
 }
 
-private struct CupShape: Shape {
+private struct CupShape: InsettableShape {
+    var insetAmount: CGFloat = 0
+
     func path(in rect: CGRect) -> Path {
         var path = Path()
 
-        let topInset = rect.width * 0.17
-        let bottomInset = rect.width * 0.09
+        let left = rect.minX + insetAmount
+        let right = rect.maxX - insetAmount
+        let top = rect.minY + insetAmount
+        let bottom = rect.maxY - insetAmount
+        let width = max(0, right - left)
+        let height = max(0, bottom - top)
 
-        path.move(to: CGPoint(x: topInset, y: 0))
-        path.addLine(to: CGPoint(x: rect.width - topInset, y: 0))
-        path.addQuadCurve(
-            to: CGPoint(x: rect.width - bottomInset, y: rect.height),
-            control: CGPoint(x: rect.width * 1.03, y: rect.height * 0.52)
+        let rimInset = width * 0.11
+        let baseInset = width * 0.24
+
+        let leftRim = CGPoint(x: left + rimInset, y: top)
+        let rightRim = CGPoint(x: right - rimInset, y: top)
+        let rightBase = CGPoint(x: right - baseInset, y: bottom)
+        let leftBase = CGPoint(x: left + baseInset, y: bottom)
+
+        path.move(to: leftRim)
+        path.addLine(to: rightRim)
+
+        path.addCurve(
+            to: rightBase,
+            control1: CGPoint(x: rightRim.x + width * 0.07, y: top + height * 0.30),
+            control2: CGPoint(x: rightBase.x + width * 0.05, y: top + height * 0.78)
         )
-        path.addLine(to: CGPoint(x: bottomInset, y: rect.height))
+
         path.addQuadCurve(
-            to: CGPoint(x: topInset, y: 0),
-            control: CGPoint(x: -rect.width * 0.03, y: rect.height * 0.52)
+            to: leftBase,
+            control: CGPoint(x: left + width * 0.5, y: bottom + height * 0.05)
         )
+
+        path.addCurve(
+            to: leftRim,
+            control1: CGPoint(x: leftBase.x - width * 0.05, y: top + height * 0.78),
+            control2: CGPoint(x: leftRim.x - width * 0.07, y: top + height * 0.30)
+        )
+
         path.closeSubpath()
 
         return path
+    }
+
+    func inset(by amount: CGFloat) -> CupShape {
+        var shape = self
+        shape.insetAmount += amount
+        return shape
     }
 }
 
