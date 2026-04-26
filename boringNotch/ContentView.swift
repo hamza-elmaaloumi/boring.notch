@@ -376,27 +376,37 @@ struct ContentView: View {
 
     @ViewBuilder
     func BoringFaceAnimation(timerText: String? = nil, timerColor: Color = .white) -> some View {
+        let timerSlotWidth: CGFloat = 72
+        let faceSlotSize = max(0, vm.effectiveClosedNotchHeight - 12)
+
         HStack(spacing: 0) {
             if let timerText {
                 Text(timerText)
                     .font(.system(size: 14, weight: .semibold, design: .monospaced))
                     .monospacedDigit()
                     .foregroundStyle(timerColor)
-                    .frame(width: max(72, CGFloat(timerText.count) * 10), alignment: .leading)
+                    .frame(width: timerSlotWidth, alignment: .leading)
                     .padding(.leading, 4)
-                    .offset(x: -11)
+                    .offset(x: -8)
             } else {
                 Rectangle()
                     .fill(.clear)
-                    .frame(
-                        width: max(0, vm.effectiveClosedNotchHeight - 12),
-                        height: max(0, vm.effectiveClosedNotchHeight - 12)
-                    )
+                    .frame(width: timerSlotWidth, height: faceSlotSize)
             }
+
             Rectangle()
                 .fill(.black)
                 .frame(width: vm.closedNotchSize.width - 20)
-            MinimalFaceFeatures()
+
+            ZStack {
+                Rectangle()
+                    .fill(.clear)
+
+                MinimalFaceFeatures()
+                    .offset(x: 5)
+            }
+            .frame(width: faceSlotSize + 10, height: faceSlotSize)
+            .padding(.trailing, 6)
         }.frame(
             height: vm.effectiveClosedNotchHeight,
             alignment: .center
