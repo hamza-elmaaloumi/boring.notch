@@ -3,6 +3,7 @@ import SwiftUI
 struct ClipboardHistoryView: View {
     @Binding var currentState: ClipboardState
     @ObservedObject private var clipboardManager = ClipboardManager.shared
+    @EnvironmentObject private var vm: BoringViewModel
     
     @State private var copiedItemId: UUID? = nil
     
@@ -38,6 +39,9 @@ struct ClipboardHistoryView: View {
                             item: item,
                             isCopied: copiedItemId == item.id
                         ) {
+                            withAnimation(.smooth) {
+                                vm.close()
+                            }
                             copyToClipboard(item)
                         }
                     }
@@ -48,7 +52,11 @@ struct ClipboardHistoryView: View {
     }
     
     private func copyToClipboard(_ item: ClipboardItem) {
-        clipboardManager.copyText(item.text)
+        clipboardManager.copyText(
+            item.text,
+            sourceBundleIdentifier: item.sourceBundleIdentifier,
+            sourceApplicationName: item.sourceApplicationName
+        )
         
         withAnimation {
             copiedItemId = item.id
@@ -71,26 +79,18 @@ struct ClipboardItemRow: View {
     
     var body: some View {
         Button(action: action) {
-            HStack {
+            HStack(spacing: 10) {
+                sourceIcon
+
                 Text(item.text)
                     .lineLimit(1)
                     .font(.subheadline)
                     .foregroundColor(.primary)
                 Spacer()
-                
-                if isCopied {
-                    HStack(spacing: 4) {
-                        Text("Copied")
-                            .font(.caption)
-                        Image(systemName: "checkmark")
-                    }
-                    .foregroundColor(.green)
-                    .transition(.opacity)
-                } else {
-                    Image(systemName: "doc.on.doc")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
+
+                Image(systemName: "doc.on.clipboard")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundColor(isCopied ? .green : .secondary)
             }
             .padding(.vertical, 0)
             .padding(.horizontal, 8)
@@ -105,6 +105,22 @@ struct ClipboardItemRow: View {
             } else {
                 NSCursor.pop()
             }
+        }
+    }
+
+    @ViewBuilder
+    private var sourceIcon: some View {
+        if let bundleIdentifier = item.sourceBundleIdentifier,
+           let appIcon = AppIconAsNSImage(for: bundleIdentifier) {
+            Image(nsImage: appIcon)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 18, height: 18)
+        } else {
+            Image(systemName: "doc")
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundColor(.secondary)
+                .frame(width: 18, height: 18)
         }
     }
 }

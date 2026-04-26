@@ -20,6 +20,7 @@ struct ContentView: View {
 
     @ObservedObject var coordinator = BoringViewCoordinator.shared
     @ObservedObject var musicManager = MusicManager.shared
+    @ObservedObject var pomodoroTimerStore = PomodoroTimerStore.shared
     @ObservedObject var batteryModel = BatteryStatusViewModel.shared
     @ObservedObject var brightnessManager = BrightnessManager.shared
     @ObservedObject var volumeManager = VolumeManager.shared
@@ -290,6 +291,11 @@ struct ContentView: View {
                       } else if (!coordinator.expandingView.show || coordinator.expandingView.type == .music) && vm.notchState == .closed && (musicManager.isPlaying || !musicManager.isPlayerIdle) && coordinator.musicLiveActivityEnabled && !vm.hideOnClosed {
                           MusicLiveActivity()
                               .frame(alignment: .center)
+                      } else if vm.notchState == .closed && pomodoroTimerStore.isRunning {
+                          BoringFaceAnimation(
+                            timerText: timeRemainingText,
+                            timerColor: pomodoroTimerColor
+                          )
                       } else if !coordinator.expandingView.show && vm.notchState == .closed && (!musicManager.isPlaying && musicManager.isPlayerIdle) && Defaults[.showNotHumanFace] && !vm.hideOnClosed  {
                           BoringFaceAnimation()
                        } else if vm.notchState == .open {
@@ -356,8 +362,10 @@ struct ContentView: View {
                     }
                 }
                 .transition(
-                    .scale(scale: 0.8, anchor: .top)
-                    .combined(with: .opacity)
+                    .asymmetric(
+                        insertion: .move(edge: .top).combined(with: .opacity),
+                        removal: .move(edge: .top).combined(with: .opacity)
+                    )
                     .animation(.smooth(duration: 0.35))
                 )
                 .zIndex(1)
@@ -369,20 +377,27 @@ struct ContentView: View {
     }
 
     @ViewBuilder
-    func BoringFaceAnimation() -> some View {
-        HStack {
-            HStack {
+    func BoringFaceAnimation(timerText: String? = nil, timerColor: Color = .white) -> some View {
+        HStack(spacing: 0) {
+            if let timerText {
+                Text(timerText)
+                    .font(.system(size: 14, weight: .semibold, design: .monospaced))
+                    .monospacedDigit()
+                    .foregroundStyle(timerColor)
+                    .frame(width: max(54, CGFloat(timerText.count) * 9), alignment: .leading)
+                    .padding(.leading, 10)
+            } else {
                 Rectangle()
                     .fill(.clear)
                     .frame(
                         width: max(0, vm.effectiveClosedNotchHeight - 12),
                         height: max(0, vm.effectiveClosedNotchHeight - 12)
                     )
-                Rectangle()
-                    .fill(.black)
-                    .frame(width: vm.closedNotchSize.width - 20)
-                MinimalFaceFeatures()
             }
+            Rectangle()
+                .fill(.black)
+                .frame(width: vm.closedNotchSize.width - 20)
+            MinimalFaceFeatures()
         }.frame(
             height: vm.effectiveClosedNotchHeight,
             alignment: .center
@@ -510,6 +525,24 @@ struct ContentView: View {
         withAnimation(animationSpring) {
             vm.open()
         }
+    }
+
+    private var timeRemainingText: String {
+        let minutes = pomodoroTimerStore.timeRemaining / 60
+        let seconds = pomodoroTimerStore.timeRemaining % 60
+        return String(format: "%02d:%02d", minutes, seconds)
+    }
+
+    private var pomodoroTimerColor: Color {
+        if pomodoroTimerStore.timeRemaining <= 60 {
+            return .red
+        }
+
+        if pomodoroTimerStore.timeRemaining <= 180 {
+            return .orange
+        }
+
+        return .green
     }
 
     // MARK: - Hover Management

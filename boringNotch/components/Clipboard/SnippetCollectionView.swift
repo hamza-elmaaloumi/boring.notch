@@ -3,6 +3,7 @@ import SwiftUI
 struct SnippetCollectionView: View {
     @Binding var currentState: ClipboardState
     @ObservedObject private var clipboardManager = ClipboardManager.shared
+    @EnvironmentObject private var vm: BoringViewModel
     
     @State private var copiedSnippetId: UUID? = nil
     
@@ -42,6 +43,9 @@ struct SnippetCollectionView: View {
                                 snippet: snippet,
                                 isCopied: copiedSnippetId == snippet.id
                             ) {
+                                withAnimation(.smooth) {
+                                    vm.close()
+                                }
                                 copyToClipboard(snippet)
                             }
                         }

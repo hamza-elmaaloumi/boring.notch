@@ -38,20 +38,36 @@ class ClipboardManager: ObservableObject {
         lastChangeCount = pasteboard.changeCount
         
         if let copiedString = pasteboard.string(forType: textType), !copiedString.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            addHistoryItem(copiedString)
+            let sourceApplication = NSWorkspace.shared.frontmostApplication
+            addHistoryItem(
+                copiedString,
+                sourceBundleIdentifier: sourceApplication?.bundleIdentifier,
+                sourceApplicationName: sourceApplication?.localizedName
+            )
         }
     }
     
-    func addHistoryItem(_ text: String) {
-        // Prevent immediate duplicates
-        if let first = history.first, first.text == text {
+    func addHistoryItem(
+        _ text: String,
+        sourceBundleIdentifier: String? = nil,
+        sourceApplicationName: String? = nil
+    ) {
+        // Prevent immediate duplicates unless the source metadata changed.
+        if let first = history.first,
+           first.text == text,
+           first.sourceBundleIdentifier == sourceBundleIdentifier,
+           first.sourceApplicationName == sourceApplicationName {
             return
         }
         
         // Remove existing duplicate to move it to top
         history.removeAll { $0.text == text }
         
-        let newItem = ClipboardItem(text: text)
+        let newItem = ClipboardItem(
+            text: text,
+            sourceBundleIdentifier: sourceBundleIdentifier,
+            sourceApplicationName: sourceApplicationName
+        )
         history.insert(newItem, at: 0)
         
         if history.count > 30 {
@@ -87,11 +103,19 @@ class ClipboardManager: ObservableObject {
         }
     }
     
-    func copyText(_ text: String) {
+    func copyText(
+        _ text: String,
+        sourceBundleIdentifier: String? = nil,
+        sourceApplicationName: String? = nil
+    ) {
         pasteboard.clearContents()
         pasteboard.setString(text, forType: textType)
         // Update change count so we don't treat our own copy as a new history item
         lastChangeCount = pasteboard.changeCount
-        addHistoryItem(text)
+        addHistoryItem(
+            text,
+            sourceBundleIdentifier: sourceBundleIdentifier,
+            sourceApplicationName: sourceApplicationName
+        )
     }
 }
