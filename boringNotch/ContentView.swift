@@ -387,7 +387,7 @@ struct ContentView: View {
                     .foregroundStyle(timerColor)
                     .frame(width: timerSlotWidth, alignment: .leading)
                     .padding(.leading, 4)
-                    .offset(x: -8)
+                    .offset(x: -4)
             } else {
                 Rectangle()
                     .fill(.clear)
