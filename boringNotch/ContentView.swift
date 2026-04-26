@@ -291,13 +291,11 @@ struct ContentView: View {
                       } else if (!coordinator.expandingView.show || coordinator.expandingView.type == .music) && vm.notchState == .closed && (musicManager.isPlaying || !musicManager.isPlayerIdle) && coordinator.musicLiveActivityEnabled && !vm.hideOnClosed {
                           MusicLiveActivity()
                               .frame(alignment: .center)
-                      } else if vm.notchState == .closed && pomodoroTimerStore.isRunning {
-                          BoringFaceAnimation(
-                            timerText: timeRemainingText,
-                            timerColor: pomodoroTimerColor
-                          )
-                      } else if !coordinator.expandingView.show && vm.notchState == .closed && (!musicManager.isPlaying && musicManager.isPlayerIdle) && Defaults[.showNotHumanFace] && !vm.hideOnClosed  {
-                          BoringFaceAnimation()
+                                            } else if !coordinator.expandingView.show && vm.notchState == .closed && (!musicManager.isPlaying && musicManager.isPlayerIdle) && !vm.hideOnClosed {
+                                                    BoringFaceAnimation(
+                                                        timerText: pomodoroTimerStore.isRunning ? timeRemainingText : nil,
+                                                        timerColor: pomodoroTimerColor
+                                                    )
                        } else if vm.notchState == .open {
                            BoringHeader()
                                .frame(height: max(24, vm.effectiveClosedNotchHeight))
@@ -386,7 +384,7 @@ struct ContentView: View {
                     .foregroundStyle(timerColor)
                     .frame(width: max(72, CGFloat(timerText.count) * 10), alignment: .leading)
                     .padding(.leading, 4)
-                    .offset(x: -14)
+                    .offset(x: -11)
             } else {
                 Rectangle()
                     .fill(.clear)
