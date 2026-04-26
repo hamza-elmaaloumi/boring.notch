@@ -19,12 +19,12 @@ struct WaterTrackerView: View {
     }
 
     private let bubbles: [BubbleConfig] = [
-        .init(x: -24, size: 6, travel: 10, duration: 1.9, delay: 0.0),
-        .init(x: -8, size: 4, travel: 12, duration: 1.6, delay: 0.2),
-        .init(x: 10, size: 7, travel: 14, duration: 2.1, delay: 0.15),
-        .init(x: 24, size: 5, travel: 9, duration: 1.8, delay: 0.3),
-        .init(x: -16, size: 5, travel: 11, duration: 2.0, delay: 0.4),
-        .init(x: 18, size: 4, travel: 8, duration: 1.7, delay: 0.1)
+        .init(x: -16, size: 5, travel: 10, duration: 1.9, delay: 0.0),
+        .init(x: -4, size: 4, travel: 11, duration: 1.6, delay: 0.2),
+        .init(x: 8, size: 6, travel: 13, duration: 2.1, delay: 0.15),
+        .init(x: 20, size: 4, travel: 9, duration: 1.8, delay: 0.3),
+        .init(x: -10, size: 5, travel: 11, duration: 2.0, delay: 0.4),
+        .init(x: 14, size: 4, travel: 8, duration: 1.7, delay: 0.1)
     ]
 
     private var fillPercentage: CGFloat {
@@ -38,82 +38,103 @@ struct WaterTrackerView: View {
     }
 
     var body: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: 8) {
             Text("Hydration")
                 .font(.headline)
                 .foregroundColor(.blue)
 
-            ZStack {
-                GlassShape()
-                    .fill(Color.white.opacity(0.05))
+            ZStack(alignment: .bottom) {
+                ZStack {
+                    CupShape()
+                        .fill(Color.white.opacity(0.06))
 
-                GlassShape()
-                    .stroke(Color.white.opacity(0.35), lineWidth: 2.2)
+                    GeometryReader { proxy in
+                        let cupHeight = proxy.size.height
+                        let fillHeight = max(6, (cupHeight - 8) * fillPercentage)
 
-                GeometryReader { proxy in
-                    let fillHeight = max(8, (proxy.size.height - 8) * fillPercentage)
+                        ZStack(alignment: .bottom) {
+                            LinearGradient(
+                                colors: [
+                                    Color.cyan.opacity(0.96),
+                                    Color.blue.opacity(0.84)
+                                ],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
 
-                    ZStack(alignment: .top) {
-                        LinearGradient(
-                            colors: [
-                                Color.cyan.opacity(0.95),
-                                Color.blue.opacity(0.85)
-                            ],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
+                            WaterWaveShape(waveHeight: 3.0, phase: wavePhase)
+                                .fill(Color.white.opacity(0.24))
+                                .frame(height: 14)
+                                .offset(y: -1)
 
-                        WaterWaveShape(waveHeight: 3.5, phase: wavePhase)
-                            .fill(Color.white.opacity(0.24))
-                            .frame(height: 14)
-                            .offset(y: 1)
-
-                        ZStack {
-                            ForEach(bubbles) { bubble in
-                                Circle()
-                                    .fill(Color.white.opacity(0.35))
-                                    .frame(width: bubble.size, height: bubble.size)
-                                    .offset(
-                                        x: bubble.x,
-                                        y: animateBubbles ? -bubble.travel : bubble.travel
-                                    )
-                                    .animation(
-                                        .easeInOut(duration: bubble.duration)
-                                            .repeatForever(autoreverses: true)
-                                            .delay(bubble.delay),
-                                        value: animateBubbles
-                                    )
+                            ZStack {
+                                ForEach(bubbles) { bubble in
+                                    Circle()
+                                        .fill(Color.white.opacity(0.34))
+                                        .frame(width: bubble.size, height: bubble.size)
+                                        .offset(
+                                            x: bubble.x,
+                                            y: animateBubbles ? -bubble.travel : bubble.travel
+                                        )
+                                        .animation(
+                                            .easeInOut(duration: bubble.duration)
+                                                .repeatForever(autoreverses: true)
+                                                .delay(bubble.delay),
+                                            value: animateBubbles
+                                        )
+                                }
                             }
+                            .opacity(fillPercentage > 0.05 ? 1 : 0)
                         }
-                        .opacity(fillPercentage > 0.05 ? 1 : 0)
+                        .frame(width: proxy.size.width - 8, height: fillHeight, alignment: .bottom)
+                        .clipShape(CupShape())
+                        .offset(x: 4, y: 4)
+                        .animation(.spring(response: 0.42, dampingFraction: 0.84), value: fillPercentage)
                     }
-                    .frame(width: proxy.size.width - 8, height: fillHeight, alignment: .top)
-                    .clipShape(GlassShape())
-                    .offset(x: 4, y: proxy.size.height - fillHeight - 4)
-                    .animation(.spring(response: 0.45, dampingFraction: 0.82), value: fillPercentage)
+
+                    CupShape()
+                        .stroke(Color.white.opacity(0.38), lineWidth: 2)
                 }
+                .frame(width: 84, height: 110)
+                .shadow(color: Color.black.opacity(0.18), radius: 8, x: 0, y: 5)
+
+                HStack(spacing: 12) {
+                    Button(action: decrementWater) {
+                        Image(systemName: "minus")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundColor(.white)
+                            .frame(width: 28, height: 28)
+                            .background(Color.gray.opacity(0.35))
+                            .clipShape(Circle())
+                    }
+                    .buttonStyle(PlainButtonStyle())
+
+                    Text(progressText)
+                        .font(.caption.weight(.semibold))
+                        .monospacedDigit()
+                        .foregroundStyle(.white.opacity(0.95))
+                        .frame(minWidth: 92)
+
+                    Button(action: incrementWater) {
+                        Image(systemName: "plus")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundColor(.white)
+                            .frame(width: 28, height: 28)
+                            .background(Color.cyan.opacity(0.95))
+                            .clipShape(Circle())
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 8)
+                .background(Color.black.opacity(0.18))
+                .clipShape(Capsule())
+                .overlay(
+                    Capsule().stroke(Color.white.opacity(0.12), lineWidth: 1)
+                )
+                .offset(y: 24)
             }
-            .frame(width: 102, height: 126)
-
-            HStack(spacing: 12) {
-                Button(action: decrementWater) {
-                    Image(systemName: "minus.circle.fill")
-                        .font(.system(size: 20, weight: .semibold))
-                        .foregroundColor(.gray)
-                }
-                .buttonStyle(PlainButtonStyle())
-
-                Text(progressText)
-                    .font(.callout.weight(.semibold))
-                    .frame(minWidth: 88)
-
-                Button(action: incrementWater) {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.system(size: 20, weight: .semibold))
-                        .foregroundColor(.blue)
-                }
-                .buttonStyle(PlainButtonStyle())
-            }
+            .frame(width: 120, height: 146)
         }
         .frame(maxWidth: .infinity)
         .onAppear {
@@ -125,31 +146,35 @@ struct WaterTrackerView: View {
     }
 
     private func incrementWater() {
-        waterConsumed += waterIncrement
+        withAnimation(.spring(response: 0.42, dampingFraction: 0.82)) {
+            waterConsumed += waterIncrement
+        }
     }
 
     private func decrementWater() {
-        waterConsumed = max(0, waterConsumed - waterIncrement)
+        withAnimation(.spring(response: 0.42, dampingFraction: 0.82)) {
+            waterConsumed = max(0, waterConsumed - waterIncrement)
+        }
     }
 }
 
-private struct GlassShape: Shape {
+private struct CupShape: Shape {
     func path(in rect: CGRect) -> Path {
         var path = Path()
 
-        let topInset = rect.width * 0.16
-        let bottomInset = rect.width * 0.06
+        let topInset = rect.width * 0.17
+        let bottomInset = rect.width * 0.09
 
         path.move(to: CGPoint(x: topInset, y: 0))
         path.addLine(to: CGPoint(x: rect.width - topInset, y: 0))
         path.addQuadCurve(
             to: CGPoint(x: rect.width - bottomInset, y: rect.height),
-            control: CGPoint(x: rect.width * 1.02, y: rect.height * 0.46)
+            control: CGPoint(x: rect.width * 1.03, y: rect.height * 0.52)
         )
         path.addLine(to: CGPoint(x: bottomInset, y: rect.height))
         path.addQuadCurve(
             to: CGPoint(x: topInset, y: 0),
-            control: CGPoint(x: -rect.width * 0.02, y: rect.height * 0.46)
+            control: CGPoint(x: -rect.width * 0.03, y: rect.height * 0.52)
         )
         path.closeSubpath()
 

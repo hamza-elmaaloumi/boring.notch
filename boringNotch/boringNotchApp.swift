@@ -64,6 +64,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var onboardingWindowController: NSWindowController?
     private var screenLockedObserver: Any?
     private var screenUnlockedObserver: Any?
+    private var pomodoroTimerFinishedObserver: Any?
     private var isScreenLocked: Bool = false
     private var windowScreenDidChangeObserver: Any?
     private var dragDetectors: [String: DragDetector] = [:] // UUID -> DragDetector
@@ -81,6 +82,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if let observer = screenUnlockedObserver {
             DistributedNotificationCenter.default().removeObserver(observer)
             screenUnlockedObserver = nil
+        }
+        if let observer = pomodoroTimerFinishedObserver {
+            NotificationCenter.default.removeObserver(observer)
+            pomodoroTimerFinishedObserver = nil
         }
         MusicManager.shared.destroy()
         cleanupDragDetectors()
@@ -334,6 +339,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
         }
 
+        pomodoroTimerFinishedObserver = NotificationCenter.default.addObserver(
+            forName: .pomodoroTimerDidFinish,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in
+                self?.presentPomodoroTimerCompletion()
+            }
+        }
+
         // Use closure-based observers for DistributedNotificationCenter and keep tokens for removal
         screenLockedObserver = DistributedNotificationCenter.default().addObserver(
             forName: NSNotification.Name(rawValue: "com.apple.screenIsLocked"),
@@ -452,6 +467,20 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
         }
         return false
+    }
+
+    @MainActor
+    private func presentPomodoroTimerCompletion() {
+        NSApp.activate(ignoringOtherApps: true)
+        coordinator.currentView = .productivity
+
+        if Defaults[.showOnAllDisplays] {
+            viewModels.values.forEach { $0.open() }
+            windows.values.forEach { $0.makeKeyAndOrderFront(nil) }
+        } else {
+            vm.open()
+            window?.makeKeyAndOrderFront(nil)
+        }
     }
 
     @objc func screenConfigurationDidChange() {
@@ -603,6 +632,7 @@ extension Notification.Name {
     static let showOnAllDisplaysChanged = Notification.Name("showOnAllDisplaysChanged")
     static let automaticallySwitchDisplayChanged = Notification.Name("automaticallySwitchDisplayChanged")
     static let expandedDragDetectionChanged = Notification.Name("expandedDragDetectionChanged")
+    static let pomodoroTimerDidFinish = Notification.Name("PomodoroTimerDidFinish")
 }
 
 extension CGRect: @retroactive Hashable {
