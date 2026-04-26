@@ -95,15 +95,15 @@ struct WaterTrackerView: View {
                     CupShape()
                         .stroke(Color.white.opacity(0.38), lineWidth: 2)
                 }
-                .frame(width: 84, height: 110)
+                .frame(width: 78, height: 98)
                 .shadow(color: Color.black.opacity(0.18), radius: 8, x: 0, y: 5)
 
-                HStack(spacing: 12) {
+                HStack(spacing: 10) {
                     Button(action: decrementWater) {
                         Image(systemName: "minus")
                             .font(.system(size: 14, weight: .semibold))
                             .foregroundColor(.white)
-                            .frame(width: 28, height: 28)
+                            .frame(width: 24, height: 24)
                             .background(Color.gray.opacity(0.35))
                             .clipShape(Circle())
                     }
@@ -113,28 +113,28 @@ struct WaterTrackerView: View {
                         .font(.caption.weight(.semibold))
                         .monospacedDigit()
                         .foregroundStyle(.white.opacity(0.95))
-                        .frame(minWidth: 92)
+                        .frame(minWidth: 84)
 
                     Button(action: incrementWater) {
                         Image(systemName: "plus")
                             .font(.system(size: 14, weight: .semibold))
                             .foregroundColor(.white)
-                            .frame(width: 28, height: 28)
+                            .frame(width: 24, height: 24)
                             .background(Color.cyan.opacity(0.95))
                             .clipShape(Circle())
                     }
                     .buttonStyle(PlainButtonStyle())
                 }
-                .padding(.horizontal, 10)
-                .padding(.vertical, 8)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 7)
                 .background(Color.black.opacity(0.18))
                 .clipShape(Capsule())
                 .overlay(
                     Capsule().stroke(Color.white.opacity(0.12), lineWidth: 1)
                 )
-                .offset(y: 24)
+                .offset(y: 10)
             }
-            .frame(width: 120, height: 146)
+            .frame(width: 108, height: 120)
         }
         .frame(maxWidth: .infinity)
         .onAppear {
