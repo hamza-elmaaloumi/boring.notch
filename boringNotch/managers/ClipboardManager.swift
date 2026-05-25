@@ -90,6 +90,11 @@ class ClipboardManager: ObservableObject {
         }
     }
     
+    func moveSnippet(fromOffsets: IndexSet, toOffset: Int) {
+        snippets.move(fromOffsets: fromOffsets, toOffset: toOffset)
+        saveSnippets()
+    }
+    
     func saveSnippets() {
         if let data = try? JSONEncoder().encode(snippets) {
             UserDefaults.standard.set(data, forKey: snippetsKey)

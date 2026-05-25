@@ -23,8 +23,10 @@ struct SnippetsSettingsView: View {
                         selectedSnippetId = nil
                     }
                 }
+                .onMove(perform: moveSnippet)
             }
             .listStyle(SidebarListStyle())
+            .environment(\.editMode, .constant(.active))
             .navigationTitle("Snippets")
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
@@ -75,5 +77,9 @@ struct SnippetsSettingsView: View {
         clipboardManager.snippets.append(newSnippet)
         clipboardManager.saveSnippets()
         selectedSnippetId = newSnippet.id
+    }
+    
+    private func moveSnippet(fromOffsets: IndexSet, toOffset: Int) {
+        clipboardManager.moveSnippet(fromOffsets: fromOffsets, toOffset: toOffset)
     }
 }
