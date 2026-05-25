@@ -30,7 +30,11 @@ extension NSItemProvider {
         NSLog(String(describing: self.registeredTypeIdentifiers))
         guard hasItemConformingToTypeIdentifier(UTType.data.identifier) else { return nil }
         return await withCheckedContinuation { (cont: CheckedContinuation<Data?, Never>) in
-            loadItem(forTypeIdentifier: UTType.data.identifier, options: nil) { item, error in
+            loadItem(forTypeIdentifier: UTType.data.identifier, options: nil) { [weak self] item, error in
+                guard let self else {
+                    cont.resume(returning: nil)
+                    return
+                }
                 if let error = error {
                     print("Error loading data for type \(UTType.data.identifier): \(error.localizedDescription)")
                     cont.resume(returning: nil)

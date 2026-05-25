@@ -98,7 +98,8 @@ class DrinkingReminderManager: ObservableObject {
     }
     
     deinit {
-        stop()
+        timer?.invalidate()
+        timer = nil
         cancellables.removeAll()
     }
 }
