@@ -24,5 +24,13 @@ class BoringStatusMenu: NSMenu {
     required init(coder: NSCoder) {
         super.init(coder: coder)
     }
+    
+    @objc private func showMenu() {
+        statusItem?.menu?.popUp(positioning: nil, at: NSEvent.mouseLocation, in: nil)
+    }
+    
+    @objc private func quitAction() {
+        NSApplication.shared.terminate(self)
+    }
 
 }
