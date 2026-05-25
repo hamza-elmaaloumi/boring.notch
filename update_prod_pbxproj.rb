@@ -1,19 +1,29 @@
 require 'xcodeproj'
+require 'find'
 
 project_path = 'boringNotch.xcodeproj'
 project = Xcodeproj::Project.open(project_path)
 target = project.targets.find { |t| t.name == 'boringNotch' } || project.targets.first
 
-files = [
-  'boringNotch/components/Productivity/ProductivityRootView.swift',
-  'boringNotch/components/Productivity/PomodoroTimerView.swift',
-  'boringNotch/components/Productivity/WaterTrackerView.swift',
-  'boringNotch/components/Settings/ProductivitySettingsView.swift'
-]
+exclude_dirs = ['Preview Content', 'boringNotch.xcodeproj']
+exclude_patterns = ['.DS_Store']
 
-files.each do |fpath|
+swift_files = []
+Find.find('boringNotch') do |path|
+  Find.prune if File.directory?(path) && exclude_dirs.include?(File.basename(path))
+  next unless path.end_with?('.swift')
+  next if exclude_patterns.any? { |p| path.include?(p) }
+  swift_files << path
+end
+
+swift_files.each do |fpath|
   name = File.basename(fpath)
-  project.files.select { |r| r.path == name || r.name == name }.each { |r| target.source_build_phase.remove_file_reference(r); r.remove_from_project }
+
+  existing_refs = project.files.select { |r| r.path == name || r.path == fpath }
+  existing_refs.each do |ref|
+    target.source_build_phase.remove_file_reference(ref)
+    ref.remove_from_project
+  end
 end
 
 project.save
@@ -21,10 +31,11 @@ project.save
 project = Xcodeproj::Project.open(project_path)
 target = project.targets.find { |t| t.name == 'boringNotch' }
 
-files.each do |fpath|
+swift_files.each do |fpath|
   ref = project.main_group.new_reference(fpath)
   target.source_build_phase.add_file_reference(ref)
 end
 
 project.save
-puts "Added Productivity views to PBXPROJ using real_path"
+
+puts "Linked #{swift_files.length} Swift files to target '#{target.name}'"
