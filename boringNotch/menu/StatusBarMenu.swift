@@ -4,8 +4,8 @@ class BoringStatusMenu: NSMenu {
     
     var statusItem: NSStatusItem!
     
-    override init() {
-        super.init()
+    init() {
+        super.init(title: "")
         
         // Initialize the status item
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
@@ -19,6 +19,10 @@ class BoringStatusMenu: NSMenu {
         let menu = NSMenu()
         menu.addItem(NSMenuItem(title: "Quit", action: #selector(quitAction), keyEquivalent: "q"))
         statusItem.menu = menu
+    }
+    
+    required init(coder: NSCoder) {
+        super.init(coder: coder)
     }
 
 }
