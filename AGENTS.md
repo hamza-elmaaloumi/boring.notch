@@ -94,3 +94,18 @@ boringNotch/
 - **Non-Sendable Types:** Types like `NSImage`, `NSView`, and other AppKit/UI classes are non-Sendable. They CANNOT be passed across actor boundaries or stored inside background `Task` dictionaries.
 - **UI & State:** If a Service or Manager holds `NSImage` state or updates the UI, you MUST mark the entire class with `@MainActor`.
 - **Background Processing:** If you need to process images in the background, you must use thread-safe types like `Data` or `CGImage`. NEVER use `NSImage` for background processing.
+- **`deinit` in `@MainActor` classes:** In Swift 6, `deinit` is NOT isolated to the class's global actor. You CANNOT call `@MainActor`-isolated methods from `deinit`. Inline cleanup directly instead (e.g., `timer?.invalidate(); timer = nil` rather than calling `stop()`).
+- **Queue-based isolation is NOT recognized:** `.main` queue dispatch does NOT satisfy actor isolation in Swift 6. The compiler only tracks actor annotations, not dispatch queues. If a closure runs on `.main` queue but is not `@MainActor`-annotated, it is treated as non-isolated. Use `Task { @MainActor in ... }` to bridge.
+- **`@Sendable` closures + non-Sendable `self`:** APIs like `NSItemProvider.loadItem(forTypeIdentifier:options:completionHandler:)` take `@Sendable` completion handlers. Capturing `self` (which is non-Sendable for AppKit/Foundation types) inside a `@Sendable` closure is illegal. ALWAYS use `[weak self]` capture list + `guard let self` in completion handlers passed to Foundation/AppKit APIs.
+
+### 4. VERIFICATION PROCESS (NO XCODE ON DEV MACHINE)
+- **I CANNOT BUILD locally.** Xcode is not installed on this machine. Every change I make is blind.
+- **I must read the ENTIRE file before editing it** — not just the lines reported in the error. Unrelated bugs in the same file will surface once the compiler reaches it.
+- **After every change, the user MUST build** to verify. Do not batch multiple fixes before asking for a build — errors compound and become harder to trace.
+- **Never trust "ran successfully" from a script as proof the script did what was intended.** Verify the output matches expectations (e.g., check `grep` for the expected entries in `project.pbxproj` after running the linker script).
+
+### 5. SELECTOR SAFETY IN APPKIT
+- `#selector(...)` requires the method to exist on the class or its superclass, and the method must be marked `@objc`. Before using `#selector(foo)`, verify:
+  1. The method `foo` is defined in this class (or superclass), not in a different class.
+  2. The method is exposed with `@objc` (e.g., `@objc private func foo()`).
+- Dead classes (files that exist but are never instantiated or referenced) still get compiled. If they contain unresolvable selectors, they will fail the build. Audit the entire file, not just the parts you change.
