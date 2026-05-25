@@ -46,7 +46,7 @@ struct ClipboardHistoryView: View {
                         }
                     }
                 }
-                .padding()
+                .padding(.horizontal)
             }
         }
     }

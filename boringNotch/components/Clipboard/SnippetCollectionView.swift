@@ -36,7 +36,7 @@ struct SnippetCollectionView: View {
                         Text("No snippets saved. Open Settings to add snippets.")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
-                            .padding()
+                .padding(.horizontal)
                     } else {
                         ForEach(clipboardManager.snippets) { snippet in
                             SnippetItemRow(
@@ -51,7 +51,7 @@ struct SnippetCollectionView: View {
                         }
                     }
                 }
-                .padding()
+                .padding(.horizontal)
             }
         }
     }
