@@ -84,7 +84,11 @@ boringNotch/
 - **The Ruby Script:** IMMEDIATELY after creating ANY new file, you MUST run the command: `ruby update_prod_pbxproj.rb`. 
 - **Why:** If you skip running this script, the new file will not be linked to the Master List/Xcode target, and the compiler will throw a "cannot find in scope" error.
 
-### 2. STRICT SWIFT 6 CONCURRENCY
+### 2. macOS SWIFTUI RESTRICTIONS
+- Never use iOS-only SwiftUI APIs. Specifically, `editMode` (`.environment(\.editMode, ...)`) is completely unavailable on macOS targets.
+- To manage list editing, item deleting, or view toggling on macOS, use custom `@State` or `@Binding` boolean flags instead.
+
+### 3. STRICT SWIFT 6 CONCURRENCY
 - This project strictly enforces Swift 6 concurrency rules.
 - **Non-Sendable Types:** Types like `NSImage`, `NSView`, and other AppKit/UI classes are non-Sendable. They CANNOT be passed across actor boundaries or stored inside background `Task` dictionaries.
 - **UI & State:** If a Service or Manager holds `NSImage` state or updates the UI, you MUST mark the entire class with `@MainActor`.

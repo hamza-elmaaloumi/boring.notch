@@ -7,6 +7,7 @@ struct SnippetsSettingsView: View {
     @State private var draftTitle: String = ""
     @State private var draftText: String = ""
     @State private var selectedSnippetId: UUID? = nil
+    @State private var isEditing = true
     
     var body: some View {
         NavigationSplitView {
@@ -26,7 +27,6 @@ struct SnippetsSettingsView: View {
                 .onMove(perform: moveSnippet)
             }
             .listStyle(SidebarListStyle())
-            .environment(\.editMode, .constant(.active))
             .navigationTitle("Snippets")
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
