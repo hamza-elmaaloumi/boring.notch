@@ -146,6 +146,7 @@ struct WaterTrackerView: View {
         }
         .frame(maxWidth: .infinity)
         .onAppear {
+            ProductivityDataStore.shared.checkDailyReset()
             animateBubbles = true
             withAnimation(.linear(duration: 2.0).repeatForever(autoreverses: false)) {
                 wavePhase = .pi * 2
@@ -157,6 +158,22 @@ struct WaterTrackerView: View {
         withAnimation(.spring(response: 0.42, dampingFraction: 0.82)) {
             waterConsumed += waterIncrement
         }
+
+        let amountMl: Int
+        if waterUnit == "cups" {
+            amountMl = Int(Double(waterIncrement) * 236.588)
+        } else {
+            amountMl = waterIncrement
+        }
+
+        let isDuringFocus = PomodoroTimerStore.shared.isRunning && PomodoroTimerStore.shared.currentMode == .focus
+        let log = WaterLogEntry(
+            date: Date(),
+            amountMl: amountMl,
+            wasDuringFocus: isDuringFocus,
+            focusSessionId: isDuringFocus ? PomodoroTimerStore.shared.currentSessionId : nil
+        )
+        ProductivityDataStore.shared.saveWaterLog(log)
     }
 
     private func decrementWater() {

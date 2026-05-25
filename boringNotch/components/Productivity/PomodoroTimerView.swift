@@ -1,4 +1,5 @@
 import AppKit
+import Combine
 import SwiftUI
 
 @MainActor
@@ -30,7 +31,30 @@ final class PomodoroTimerStore: ObservableObject {
     private var shortBreakDuration: Int = 5 * 60
     private var longBreakDuration: Int = 15 * 60
 
-    private init() {}
+    var currentSessionId: UUID?
+    var sessionStartDate: Date?
+
+    private init() {
+        NotificationCenter.default.addObserver(
+            forName: NSApplication.willTerminateNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            guard let self = self else { return }
+            if self.isRunning && self.currentMode == .focus {
+                let now = Date()
+                let actualDuration = Int(now.timeIntervalSince(self.sessionStartDate ?? now))
+                let session = FocusSession(
+                    startDate: self.sessionStartDate ?? now,
+                    endDate: now,
+                    durationSeconds: actualDuration,
+                    mode: self.currentMode.rawValue,
+                    completed: false
+                )
+                ProductivityDataStore.shared.saveFocusSession(session)
+            }
+        }
+    }
 
     func configureDurations(focus: Int, shortBreak: Int, longBreak: Int) {
         focusDuration = max(1, focus) * 60
@@ -55,11 +79,26 @@ final class PomodoroTimerStore: ObservableObject {
     }
 
     func resetTimer() {
+        if isRunning && currentMode == .focus {
+            let now = Date()
+            let actualDuration = Int(now.timeIntervalSince(sessionStartDate ?? now))
+            let session = FocusSession(
+                startDate: sessionStartDate ?? now,
+                endDate: now,
+                durationSeconds: actualDuration,
+                mode: currentMode.rawValue,
+                completed: false
+            )
+            ProductivityDataStore.shared.saveFocusSession(session)
+        }
+
         timer?.invalidate()
         timer = nil
         isRunning = false
         deadline = nil
         hasCompleted = false
+        currentSessionId = nil
+        sessionStartDate = nil
         timeRemaining = duration(for: currentMode)
     }
 
@@ -89,6 +128,11 @@ final class PomodoroTimerStore: ObservableObject {
     private func startTimer() {
         if timeRemaining <= 0 {
             timeRemaining = duration(for: currentMode)
+        }
+
+        if currentMode == .focus {
+            currentSessionId = UUID()
+            sessionStartDate = Date()
         }
 
         deadline = Date().addingTimeInterval(TimeInterval(timeRemaining))
@@ -134,12 +178,25 @@ final class PomodoroTimerStore: ObservableObject {
     private func completeTimer() {
         guard isRunning || deadline != nil else { return }
 
+        if currentMode == .focus, let start = sessionStartDate {
+            let session = FocusSession(
+                startDate: start,
+                endDate: Date(),
+                durationSeconds: duration(for: currentMode),
+                mode: currentMode.rawValue,
+                completed: true
+            )
+            ProductivityDataStore.shared.saveFocusSession(session)
+        }
+
         timer?.invalidate()
         timer = nil
         isRunning = false
         deadline = nil
         timeRemaining = 0
         hasCompleted = true
+        currentSessionId = nil
+        sessionStartDate = nil
 
         NSSound(named: "Glass")?.play()
         NSApp.requestUserAttention(.criticalRequest)
@@ -168,6 +225,17 @@ struct PomodoroTimerView: View {
         return String(format: "%02d:%02d", minutes, seconds)
     }
 
+    private var todaySummary: String {
+        let total = ProductivityDataStore.shared.totalFocusTimeToday()
+        let hours = total / 3600
+        let minutes = (total % 3600) / 60
+        if hours > 0 {
+            return "Today: \(hours)h \(minutes)m focused"
+        } else {
+            return "Today: \(minutes)m focused"
+        }
+    }
+
     var body: some View {
         VStack(spacing: 8) {
             Picker("", selection: modeBinding) {
@@ -184,6 +252,10 @@ struct PomodoroTimerView: View {
             Text(timeString)
                 .font(.system(size: 34, weight: .bold, design: .monospaced))
                 .monospacedDigit()
+
+            Text(todaySummary)
+                .font(.caption2)
+                .foregroundColor(.secondary)
 
             HStack(spacing: 14) {
                 Button(action: timerStore.toggleTimer) {

@@ -65,6 +65,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var screenLockedObserver: Any?
     private var screenUnlockedObserver: Any?
     private var pomodoroTimerFinishedObserver: Any?
+    private var drinkingReminderObserver: Any?
     private var isScreenLocked: Bool = false
     private var windowScreenDidChangeObserver: Any?
     private var dragDetectors: [String: DragDetector] = [:] // UUID -> DragDetector
@@ -86,6 +87,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if let observer = pomodoroTimerFinishedObserver {
             NotificationCenter.default.removeObserver(observer)
             pomodoroTimerFinishedObserver = nil
+        }
+        if let observer = drinkingReminderObserver {
+            NotificationCenter.default.removeObserver(observer)
+            drinkingReminderObserver = nil
         }
         MusicManager.shared.destroy()
         cleanupDragDetectors()
@@ -348,6 +353,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 self?.presentPomodoroTimerCompletion()
             }
         }
+        
+        drinkingReminderObserver = NotificationCenter.default.addObserver(
+            forName: .drinkingReminderDidFire,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in
+                self?.presentDrinkingReminder()
+            }
+        }
 
         // Use closure-based observers for DistributedNotificationCenter and keep tokens for removal
         screenLockedObserver = DistributedNotificationCenter.default().addObserver(
@@ -473,6 +488,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private func presentPomodoroTimerCompletion() {
         NSApp.activate(ignoringOtherApps: true)
         coordinator.currentView = .productivity
+
+        if Defaults[.showOnAllDisplays] {
+            viewModels.values.forEach { $0.open() }
+            windows.values.forEach { $0.makeKeyAndOrderFront(nil) }
+        } else {
+            vm.open()
+            window?.makeKeyAndOrderFront(nil)
+        }
+    }
+    
+    private func presentDrinkingReminder() {
+        NSApp.activate(ignoringOtherApps: true)
 
         if Defaults[.showOnAllDisplays] {
             viewModels.values.forEach { $0.open() }
@@ -633,6 +660,7 @@ extension Notification.Name {
     static let automaticallySwitchDisplayChanged = Notification.Name("automaticallySwitchDisplayChanged")
     static let expandedDragDetectionChanged = Notification.Name("expandedDragDetectionChanged")
     static let pomodoroTimerDidFinish = Notification.Name("PomodoroTimerDidFinish")
+    static let drinkingReminderDidFire = Notification.Name("DrinkingReminderDidFire")
 }
 
 extension CGRect: @retroactive Hashable {
