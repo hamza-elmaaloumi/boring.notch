@@ -5,6 +5,8 @@ struct PomodoroDashboardView: View {
     @ObservedObject private var dataStore = ProductivityDataStore.shared
     @AppStorage("dailyFocusGoalMinutes") private var dailyGoal: Int = 120
     @State private var selectedPeriod: String = "daily"
+    @State private var hoveredSession: FocusSession?
+    @State private var hoveredDay: (day: String, minutes: Int)?
 
     var body: some View {
         VStack(spacing: 12) {
@@ -47,6 +49,40 @@ struct PomodoroDashboardView: View {
                     .chartXAxis {
                         AxisMarks(values: .automatic) { _ in
                             AxisValueLabel(format: .dateTime.hour())
+                        }
+                    }
+                    .chartOverlay { proxy in
+                        GeometryReader { geometry in
+                            Rectangle()
+                                .fill(.clear)
+                                .contentShape(Rectangle())
+                                .onContinuousHover { phase in
+                                    switch phase {
+                                    case .active(let location):
+                                        let plotFrame = proxy.plotFrame!
+                                        let origin = geometry[plotFrame].origin
+                                        let xPos = location.x - origin.x
+                                        let hoveredDate: Date? = proxy.value(atX: xPos, as: Date.self)
+                                        if let date = hoveredDate {
+                                            hoveredSession = sessions.min(by: { abs($0.startDate.timeIntervalSince(date)) < abs($1.startDate.timeIntervalSince(date)) })
+                                        }
+                                    case .ended:
+                                        hoveredSession = nil
+                                    }
+                                }
+                        }
+                    }
+                    .overlay(alignment: .top) {
+                        if let session = hoveredSession {
+                            let formatter = DateFormatter()
+                            formatter.dateFormat = "h:mm a"
+                            Text("\(formatter.string(from: session.startDate)) · \(session.durationSeconds / 60)m\(session.completed ? "" : " (interrupted)")")
+                                .font(.caption)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(.ultraThinMaterial)
+                                .clipShape(RoundedRectangle(cornerRadius: 6))
+                                .padding(.top, 4)
                         }
                     }
                     .frame(height: 140)
@@ -96,6 +132,38 @@ struct PomodoroDashboardView: View {
                     .lineStyle(StrokeStyle(lineWidth: 1, dash: [4]))
                     .foregroundStyle(Color.red.opacity(0.5))
                 }
+                .chartOverlay { proxy in
+                    GeometryReader { geometry in
+                        Rectangle()
+                            .fill(.clear)
+                            .contentShape(Rectangle())
+                            .onContinuousHover { phase in
+                                switch phase {
+                                case .active(let location):
+                                    let plotFrame = proxy.plotFrame!
+                                    let origin = geometry[plotFrame].origin
+                                    let xPos = location.x - origin.x
+                                    let day: String? = proxy.value(atX: xPos, as: String.self)
+                                    if let day, let match = data.first(where: { $0.day == day }) {
+                                        hoveredDay = (day: match.day, minutes: match.minutes)
+                                    }
+                                case .ended:
+                                    hoveredDay = nil
+                                }
+                            }
+                    }
+                }
+                .overlay(alignment: .top) {
+                    if let h = hoveredDay {
+                        Text("\(h.day) · \(h.minutes)m")
+                            .font(.caption)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(.ultraThinMaterial)
+                            .clipShape(RoundedRectangle(cornerRadius: 6))
+                            .padding(.top, 4)
+                    }
+                }
                 .frame(height: 140)
 
                 statRow(items: [
@@ -130,6 +198,38 @@ struct PomodoroDashboardView: View {
                     )
                     .lineStyle(StrokeStyle(lineWidth: 1, dash: [4]))
                     .foregroundStyle(Color.red.opacity(0.5))
+                }
+                .chartOverlay { proxy in
+                    GeometryReader { geometry in
+                        Rectangle()
+                            .fill(.clear)
+                            .contentShape(Rectangle())
+                            .onContinuousHover { phase in
+                                switch phase {
+                                case .active(let location):
+                                    let plotFrame = proxy.plotFrame!
+                                    let origin = geometry[plotFrame].origin
+                                    let xPos = location.x - origin.x
+                                    let day: String? = proxy.value(atX: xPos, as: String.self)
+                                    if let day, let match = data.first(where: { $0.day == day }) {
+                                        hoveredDay = (day: match.day, minutes: match.minutes)
+                                    }
+                                case .ended:
+                                    hoveredDay = nil
+                                }
+                            }
+                    }
+                }
+                .overlay(alignment: .top) {
+                    if let h = hoveredDay {
+                        Text("\(h.day) · \(h.minutes)m")
+                            .font(.caption)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(.ultraThinMaterial)
+                            .clipShape(RoundedRectangle(cornerRadius: 6))
+                            .padding(.top, 4)
+                    }
                 }
                 .frame(height: 140)
 

@@ -6,6 +6,8 @@ struct WaterDashboardView: View {
     @AppStorage("waterGoal") private var waterGoal: Int = 2000
     @AppStorage("waterUnit") private var waterUnit: String = "ml"
     @State private var selectedPeriod: String = "daily"
+    @State private var hoveredLog: (time: Date, amount: Int)?
+    @State private var hoveredDay: (day: String, ml: Int)?
 
     private let mlPerCup: Double = 236.588
 
@@ -93,6 +95,40 @@ struct WaterDashboardView: View {
                         AxisValueLabel(format: .dateTime.hour())
                     }
                 }
+                .chartOverlay { proxy in
+                    GeometryReader { geometry in
+                        Rectangle()
+                            .fill(.clear)
+                            .contentShape(Rectangle())
+                            .onContinuousHover { phase in
+                                switch phase {
+                                case .active(let location):
+                                    let plotFrame = proxy.plotFrame!
+                                    let origin = geometry[plotFrame].origin
+                                    let xPos = location.x - origin.x
+                                    let hoveredDate: Date? = proxy.value(atX: xPos, as: Date.self)
+                                    if let date = hoveredDate, let match = events.min(by: { abs($0.date.timeIntervalSince(date)) < abs($1.date.timeIntervalSince(date)) }) {
+                                        hoveredLog = (time: match.date, amount: match.amountMl)
+                                    }
+                                case .ended:
+                                    hoveredLog = nil
+                                }
+                            }
+                    }
+                }
+                .overlay(alignment: .top) {
+                    if let h = hoveredLog {
+                        let formatter = DateFormatter()
+                        formatter.dateFormat = "h:mm a"
+                        Text("\(formatter.string(from: h.time)) · \(displayMl(h.amount)) \(unitLabel())")
+                            .font(.caption)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(.ultraThinMaterial)
+                            .clipShape(RoundedRectangle(cornerRadius: 6))
+                            .padding(.top, 4)
+                    }
+                }
                 .frame(height: 120)
 
                 statRow(items: [
@@ -127,6 +163,38 @@ struct WaterDashboardView: View {
                     .lineStyle(StrokeStyle(lineWidth: 1, dash: [4]))
                     .foregroundStyle(Color.red.opacity(0.5))
                 }
+                .chartOverlay { proxy in
+                    GeometryReader { geometry in
+                        Rectangle()
+                            .fill(.clear)
+                            .contentShape(Rectangle())
+                            .onContinuousHover { phase in
+                                switch phase {
+                                case .active(let location):
+                                    let plotFrame = proxy.plotFrame!
+                                    let origin = geometry[plotFrame].origin
+                                    let xPos = location.x - origin.x
+                                    let day: String? = proxy.value(atX: xPos, as: String.self)
+                                    if let day, let match = data.first(where: { $0.day == day }) {
+                                        hoveredDay = (day: match.day, ml: match.ml)
+                                    }
+                                case .ended:
+                                    hoveredDay = nil
+                                }
+                            }
+                    }
+                }
+                .overlay(alignment: .top) {
+                    if let h = hoveredDay {
+                        Text("\(h.day) · \(displayMl(h.ml)) \(unitLabel())")
+                            .font(.caption)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(.ultraThinMaterial)
+                            .clipShape(RoundedRectangle(cornerRadius: 6))
+                            .padding(.top, 4)
+                    }
+                }
                 .frame(height: 120)
 
                 statRow(items: [
@@ -160,6 +228,38 @@ struct WaterDashboardView: View {
                     )
                     .lineStyle(StrokeStyle(lineWidth: 1, dash: [4]))
                     .foregroundStyle(Color.red.opacity(0.5))
+                }
+                .chartOverlay { proxy in
+                    GeometryReader { geometry in
+                        Rectangle()
+                            .fill(.clear)
+                            .contentShape(Rectangle())
+                            .onContinuousHover { phase in
+                                switch phase {
+                                case .active(let location):
+                                    let plotFrame = proxy.plotFrame!
+                                    let origin = geometry[plotFrame].origin
+                                    let xPos = location.x - origin.x
+                                    let day: String? = proxy.value(atX: xPos, as: String.self)
+                                    if let day, let match = data.first(where: { $0.day == day }) {
+                                        hoveredDay = (day: match.day, ml: match.ml)
+                                    }
+                                case .ended:
+                                    hoveredDay = nil
+                                }
+                            }
+                    }
+                }
+                .overlay(alignment: .top) {
+                    if let h = hoveredDay {
+                        Text("\(h.day) · \(displayMl(h.ml)) \(unitLabel())")
+                            .font(.caption)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(.ultraThinMaterial)
+                            .clipShape(RoundedRectangle(cornerRadius: 6))
+                            .padding(.top, 4)
+                    }
                 }
                 .frame(height: 120)
 
