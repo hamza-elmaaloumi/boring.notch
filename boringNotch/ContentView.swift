@@ -222,11 +222,7 @@ struct ContentView: View {
         .environmentObject(vm)
         .onChange(of: coordinator.currentView) { _, newView in
             hoverTask?.cancel()
-            vm.isTransitioningContent = true
-            Task { @MainActor in
-                try? await Task.sleep(for: .milliseconds(600))
-                vm.isTransitioningContent = false
-            }
+            vm.setTransitioning()
             let targetHeight: CGFloat = newView == .productivity ? 380 : openNotchSize.height
             guard vm.openNotchHeight != targetHeight else { return }
             vm.openNotchHeight = targetHeight

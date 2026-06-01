@@ -45,6 +45,16 @@ class BoringViewModel: NSObject, ObservableObject {
     @Published var isCameraExpanded: Bool = false
     @Published var isRequestingAuthorization: Bool = false
     @Published var isTransitioningContent: Bool = false
+    private var clearTransitionTask: Task<Void, Never>?
+    
+    func setTransitioning() {
+        isTransitioningContent = true
+        clearTransitionTask?.cancel()
+        clearTransitionTask = Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(600))
+            self.isTransitioningContent = false
+        }
+    }
     
     deinit {
         destroy()
@@ -195,6 +205,7 @@ class BoringViewModel: NSObject, ObservableObject {
     }
 
     func open() {
+        setTransitioning()
         self.notchSize = CGSize(width: openNotchSize.width, height: openNotchHeight)
         self.notchState = .open
 
