@@ -37,20 +37,20 @@ struct ActiveHoursSlider: View {
 
                     Circle()
                         .fill(Color.white)
-                        .frame(width: 18, height: 18)
+                        .frame(width: 24, height: 24)
                         .shadow(color: .black.opacity(0.12), radius: 3)
-                        .offset(x: startPos / 24.0 * trackWidth - 9)
-                        .gesture(DragGesture().onChanged { value in
+                        .offset(x: startPos / 24.0 * trackWidth - 12)
+                        .gesture(DragGesture(minimumDistance: 0).onChanged { value in
                             let pos = min(max(0, value.location.x / trackWidth * 24), 24)
                             startHour = min(Int(pos), 23)
                         })
 
                     Circle()
                         .fill(Color.white)
-                        .frame(width: 18, height: 18)
+                        .frame(width: 24, height: 24)
                         .shadow(color: .black.opacity(0.12), radius: 3)
-                        .offset(x: endPos / 24.0 * trackWidth - 9)
-                        .gesture(DragGesture().onChanged { value in
+                        .offset(x: endPos / 24.0 * trackWidth - 12)
+                        .gesture(DragGesture(minimumDistance: 0).onChanged { value in
                             let pos = min(max(0, value.location.x / trackWidth * 24), 24)
                             endHour = Int(pos) == 24 ? 0 : Int(pos)
                         })
