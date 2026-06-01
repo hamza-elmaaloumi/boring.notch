@@ -152,7 +152,7 @@ struct WaterTrackerView: View {
     private var endpointIcons: some View {
         let startRad = arcStartAngle * .pi / 180
         let endRad = arcEndAngle * .pi / 180
-        let r = arcRadius
+        let r = arcRadius + 8
         return ZStack {
             Image(systemName: "sun.max.fill")
                 .font(.system(size: 11))
@@ -221,12 +221,12 @@ struct WaterTrackerView: View {
         } label: {
             ZStack {
                 Circle()
-                    .fill(.white)
+                    .fill(Color(white: 0.2))
                     .frame(width: 40, height: 40)
-                    .shadow(color: .black.opacity(0.12), radius: 4, x: 0, y: 2)
+                    .shadow(color: .white.opacity(0.08), radius: 4, x: 0, y: 2)
 
-                Image(systemName: "waterbottle.fill")
-                    .font(.system(size: 18))
+                Image(systemName: "cup.and.saucer.fill")
+                    .font(.system(size: 16))
                     .foregroundStyle(.blue)
 
                 Circle()
