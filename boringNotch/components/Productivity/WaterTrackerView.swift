@@ -232,9 +232,9 @@ struct WaterTrackerView: View {
                 ZStack {
                     Circle()
                         .fill(.white)
-                        .frame(width: 18, height: 18)
-                    Image(systemName: "arrow.trianglehead.2.circlepath")
-                        .font(.system(size: 10, weight: .black))
+                        .frame(width: 22, height: 22)
+                    Image(systemName: "arrow.clockwise")
+                        .font(.system(size: 12, weight: .bold))
                         .foregroundStyle(.blue)
                 }
                 .position(x: 36, y: 36)

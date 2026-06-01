@@ -229,7 +229,7 @@ struct PomodoroTimerView: View {
         let total = ProductivityDataStore.shared.totalFocusTimeToday()
         let hours = total / 3600
         let minutes = (total % 3600) / 60
-        let accent = Color(red: 0.247, green: 0.663, blue: 0.988)
+        let accent = Color.red
         return Group {
             if hours > 0 {
                 Text("Today: ") + Text("\(hours)h \(minutes)m").foregroundColor(accent) + Text(" focused")

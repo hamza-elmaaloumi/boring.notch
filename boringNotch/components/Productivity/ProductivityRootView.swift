@@ -8,6 +8,7 @@ struct ProductivityRootView: View {
                 Divider()
                 WaterTrackerView()
                 WaterLogListView()
+                    .offset(x: -8)
             }
             .padding(.horizontal, 12)
             .padding(.top, 4)
