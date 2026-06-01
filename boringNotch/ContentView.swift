@@ -124,7 +124,6 @@ struct ContentView: View {
                 
                 mainLayout
                     .frame(height: vm.notchState == .open ? vm.notchSize.height : nil, alignment: .top)
-                    .background(.black)
                     .conditionalModifier(true) { view in
                         let openAnimation = Animation.spring(response: 0.42, dampingFraction: 0.8, blendDuration: 0)
                         let closeAnimation = Animation.spring(response: 0.45, dampingFraction: 1.0, blendDuration: 0)
@@ -223,6 +222,11 @@ struct ContentView: View {
         .environmentObject(vm)
         .onChange(of: coordinator.currentView) { _, newView in
             hoverTask?.cancel()
+            vm.isTransitioningContent = true
+            Task { @MainActor in
+                try? await Task.sleep(for: .milliseconds(600))
+                vm.isTransitioningContent = false
+            }
             let targetHeight: CGFloat = newView == .productivity ? 380 : openNotchSize.height
             guard vm.openNotchHeight != targetHeight else { return }
             vm.openNotchHeight = targetHeight

@@ -44,6 +44,7 @@ class BoringViewModel: NSObject, ObservableObject {
     let webcamManager = WebcamManager.shared
     @Published var isCameraExpanded: Bool = false
     @Published var isRequestingAuthorization: Bool = false
+    @Published var isTransitioningContent: Bool = false
     
     deinit {
         destroy()
@@ -214,7 +215,7 @@ class BoringViewModel: NSObject, ObservableObject {
     }
 
     func close() {
-        if SharingStateManager.shared.preventNotchClose {
+        if SharingStateManager.shared.preventNotchClose || isTransitioningContent {
             return
         }
         self.notchSize = getClosedNotchSize(screenUUID: self.screenUUID)
