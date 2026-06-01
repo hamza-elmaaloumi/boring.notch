@@ -2,7 +2,7 @@ import SwiftUI
 
 struct ProductivityRootView: View {
     var body: some View {
-        VStack(spacing: 0) {
+        ScrollView(.horizontal) {
             HStack(alignment: .top, spacing: 12) {
                 PomodoroTimerView()
                 Divider()
@@ -12,6 +12,6 @@ struct ProductivityRootView: View {
             .padding(.top, 4)
             .padding(.bottom, 10)
         }
-        .frame(maxHeight: 150, alignment: .top)
+        .scrollIndicators(.hidden)
     }
 }
