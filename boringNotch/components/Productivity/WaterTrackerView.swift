@@ -233,8 +233,8 @@ struct WaterTrackerView: View {
                     Circle()
                         .fill(.white)
                         .frame(width: 22, height: 22)
-                    Image(systemName: "arrow.clockwise")
-                        .font(.system(size: 12, weight: .bold))
+                    Image(systemName: "arrow.triangle.2.circlepath")
+                        .font(.system(size: 11, weight: .bold))
                         .foregroundStyle(.blue)
                 }
                 .position(x: 36, y: 36)
