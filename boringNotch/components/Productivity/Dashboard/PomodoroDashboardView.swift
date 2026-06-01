@@ -7,7 +7,7 @@ struct PomodoroDashboardView: View {
     @State private var selectedPeriod: String = "daily"
 
     var body: some View {
-        VStack {
+        VStack(spacing: 12) {
             switch selectedPeriod {
             case "daily":
                 dailyView
@@ -25,45 +25,50 @@ struct PomodoroDashboardView: View {
                 Text("Monthly").tag("monthly")
             }
             .pickerStyle(SegmentedPickerStyle())
-            .padding(.horizontal)
         }
     }
 
     private var dailyView: some View {
-        VStack {
+        VStack(spacing: 12) {
             if dataStore.sessionsToday().isEmpty {
-                Spacer()
-                Text("No sessions yet. Complete a focus session to see your stats.")
-                    .foregroundColor(.secondary)
-                Spacer()
+                emptyState(icon: "clock", message: "Complete a focus session to see your stats.")
             } else {
                 let sessions = dataStore.sessionsToday()
-                Chart(sessions, id: \.id) { session in
-                    BarMark(
-                        x: .value("Time", session.startDate, unit: .hour),
-                        y: .value("Minutes", session.durationSeconds / 60)
+
+                HStack(alignment: .top, spacing: 16) {
+                    Chart(sessions, id: \.id) { session in
+                        BarMark(
+                            x: .value("Time", session.startDate, unit: .hour),
+                            y: .value("Minutes", session.durationSeconds / 60)
+                        )
+                        .cornerRadius(4)
+                        .foregroundStyle(session.completed ? Color.green.gradient : Color.orange.gradient)
+                    }
+                    .chartXAxis {
+                        AxisMarks(values: .automatic) { _ in
+                            AxisValueLabel(format: .dateTime.hour())
+                        }
+                    }
+                    .frame(height: 140)
+
+                    let total = dataStore.totalFocusTimeToday()
+                    ProgressRingView(
+                        progress: total > 0 ? CGFloat(total) / CGFloat(dailyGoal * 60) : 0,
+                        label: "\(dailyGoal)m goal"
                     )
-                    .foregroundStyle(session.completed ? Color.green : Color.orange)
+                    .frame(width: 80, height: 80)
                 }
-                .chartXAxisLabel("Session start")
-                .chartYAxisLabel("Minutes")
-                .frame(height: 160)
-                .padding()
 
                 let total = dataStore.totalFocusTimeToday()
                 let hours = total / 3600
                 let mins = (total % 3600) / 60
                 let avg = dataStore.averageFocusTimePerSessionToday() / 60
-                Text("\(dataStore.sessionsToday().count) sessions · \(hours)h \(mins)m total · \(avg)m avg")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
 
-                ProgressRingView(
-                    progress: total > 0 ? CGFloat(total) / CGFloat(dailyGoal * 60) : 0,
-                    label: "Focus goal: \(hours)h \(mins)m / \(dailyGoal)m"
-                )
-                .frame(width: 100, height: 100)
-                .padding()
+                statRow(items: [
+                    ("\(dataStore.sessionsToday().count)", "Sessions"),
+                    ("\(hours)h \(mins)m", "Total"),
+                    ("\(avg)m", "Average")
+                ])
             }
         }
     }
@@ -71,35 +76,33 @@ struct PomodoroDashboardView: View {
     private var weeklyView: some View {
         let data = dataStore.focusTimeByDayThisWeek()
         let total = data.reduce(0) { $0 + $1.minutes }
+        let avg = total / max(data.count, 1)
 
-        return VStack {
+        return VStack(spacing: 12) {
             if data.allSatisfy({ $0.minutes == 0 }) {
-                Spacer()
-                Text("No sessions yet. Complete a focus session to see your stats.")
-                    .foregroundColor(.secondary)
-                Spacer()
+                emptyState(icon: "calendar", message: "Complete a focus session to see your stats.")
             } else {
                 Chart(data, id: \.day) { item in
                     BarMark(
                         x: .value("Day", item.day),
                         y: .value("Minutes", item.minutes)
                     )
-                    .foregroundStyle(Color.accentColor)
+                    .cornerRadius(4)
+                    .foregroundStyle(Color.accentColor.gradient)
 
                     RuleMark(
                         y: .value("Goal", Double(dailyGoal))
                     )
                     .lineStyle(StrokeStyle(lineWidth: 1, dash: [4]))
-                    .foregroundStyle(Color.red.opacity(0.6))
+                    .foregroundStyle(Color.red.opacity(0.5))
                 }
-                .chartXAxisLabel("Day")
-                .chartYAxisLabel("Minutes")
-                .frame(height: 160)
-                .padding()
+                .frame(height: 140)
 
-                Text("This week: \(total / 60)h \(total % 60)m · \(total / 7)m avg per day")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                statRow(items: [
+                    ("\(total / 60)h \(total % 60)m", "Total"),
+                    ("\(avg)m", "Avg / day"),
+                    ("\(dailyGoal)m", "Daily goal")
+                ])
             }
         }
     }
@@ -107,36 +110,69 @@ struct PomodoroDashboardView: View {
     private var monthlyView: some View {
         let data = dataStore.focusTimeByDayThisMonth()
         let total = data.reduce(0) { $0 + $1.minutes }
+        let activeDays = data.filter { $0.minutes > 0 }
+        let avg = activeDays.isEmpty ? 0 : activeDays.map { $0.minutes }.reduce(0, +) / activeDays.count
 
-        return VStack {
+        return VStack(spacing: 12) {
             if data.allSatisfy({ $0.minutes == 0 }) {
-                Spacer()
-                Text("No sessions yet. Complete a focus session to see your stats.")
-                    .foregroundColor(.secondary)
-                Spacer()
+                emptyState(icon: "calendar", message: "Complete a focus session to see your stats.")
             } else {
                 Chart(data, id: \.day) { item in
                     BarMark(
                         x: .value("Day", item.day),
                         y: .value("Minutes", item.minutes)
                     )
-                    .foregroundStyle(Color.accentColor)
+                    .cornerRadius(4)
+                    .foregroundStyle(Color.accentColor.gradient)
 
                     RuleMark(
                         y: .value("Goal", Double(dailyGoal))
                     )
                     .lineStyle(StrokeStyle(lineWidth: 1, dash: [4]))
-                    .foregroundStyle(Color.red.opacity(0.6))
+                    .foregroundStyle(Color.red.opacity(0.5))
                 }
-                .chartXAxisLabel("Day")
-                .chartYAxisLabel("Minutes")
-                .frame(height: 160)
-                .padding()
+                .frame(height: 140)
 
-                let avg = data.filter { $0.minutes > 0 }.map { $0.minutes }.reduce(0, +) / max(data.filter { $0.minutes > 0 }.count, 1)
-                Text("This month: \(total / 60)h \(total % 60)m · \(avg)m avg per day")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                statRow(items: [
+                    ("\(total / 60)h \(total % 60)m", "Total"),
+                    ("\(avg)m", "Avg / day"),
+                    ("\(activeDays.count)", "Active days")
+                ])
+            }
+        }
+    }
+
+    private func emptyState(icon: String, message: String) -> some View {
+        VStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.title3)
+                .foregroundStyle(.secondary)
+            Text(message)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+        }
+        .frame(minHeight: 100)
+        .frame(maxWidth: .infinity)
+    }
+
+    private func statRow(items: [(value: String, label: String)]) -> some View {
+        HStack(spacing: 0) {
+            ForEach(Array(items.enumerated()), id: \.offset) { _, item in
+                VStack(spacing: 2) {
+                    Text(item.value)
+                        .font(.system(.subheadline, design: .rounded).weight(.semibold))
+                        .foregroundStyle(.primary)
+                    Text(item.label)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity)
+
+                if item.label != items.last?.label {
+                    Divider()
+                        .frame(height: 24)
+                }
             }
         }
     }
@@ -147,19 +183,22 @@ struct ProgressRingView: View {
     let label: String
 
     var body: some View {
-        VStack {
+        VStack(spacing: 4) {
             ZStack {
                 Circle()
-                    .stroke(Color.gray.opacity(0.2), lineWidth: 8)
+                    .stroke(Color.gray.opacity(0.15), lineWidth: 6)
                 Circle()
                     .trim(from: 0, to: min(progress, 1))
-                    .stroke(Color.accentColor, style: StrokeStyle(lineWidth: 8, lineCap: .round))
+                    .stroke(
+                        AngularGradient(colors: [.accentColor, .accentColor.opacity(0.6)], center: .center),
+                        style: StrokeStyle(lineWidth: 6, lineCap: .round)
+                    )
                     .rotationEffect(.degrees(-90))
                     .animation(.easeInOut, value: progress)
             }
             Text(label)
                 .font(.caption2)
-                .foregroundColor(.secondary)
+                .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
         }
     }
