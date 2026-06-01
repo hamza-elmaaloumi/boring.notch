@@ -46,6 +46,7 @@ struct WaterTrackerView: View {
     @Default(.autoCalculateWaterGoal) var autoCalculateWaterGoal
 
     @State private var showCupPicker = false
+    @EnvironmentObject var vm: BoringViewModel
 
     private let containerSize: CGFloat = 300
     private let arcDiameter: CGFloat = 236
@@ -97,6 +98,9 @@ struct WaterTrackerView: View {
         .onAppear {
             ProductivityDataStore.shared.checkDailyReset()
             updateGoalIfNeeded()
+        }
+        .onChange(of: showCupPicker) { _, newValue in
+            vm.isCupPickerActive = newValue
         }
         .onChange(of: userHeight) { updateGoalIfNeeded() }
         .onChange(of: userWeight) { updateGoalIfNeeded() }
@@ -217,8 +221,8 @@ struct WaterTrackerView: View {
         }
         .buttonStyle(PlainButtonStyle())
         .position(
-            x: center.x + innerDiameter * 0.5 + 18,
-            y: center.y + innerDiameter * 0.48 + 18
+            x: center.x + innerDiameter * 0.5 + 10,
+            y: center.y + innerDiameter * 0.48 + 6
         )
         .popover(isPresented: $showCupPicker) {
             CupPickerView(

@@ -622,9 +622,9 @@ struct ContentView: View {
                         self.isHovering = false
                     }
                     
-                    if self.vm.notchState == .open && !self.vm.isBatteryPopoverActive && !SharingStateManager.shared.preventNotchClose {
-                        self.vm.close()
-                    }
+                if self.vm.notchState == .open && !self.vm.isBatteryPopoverActive && !self.vm.isCupPickerActive && !SharingStateManager.shared.preventNotchClose {
+                    self.vm.close()
+                }
                 }
             }
         }

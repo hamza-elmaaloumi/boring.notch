@@ -45,6 +45,7 @@ class BoringViewModel: NSObject, ObservableObject {
     @Published var isCameraExpanded: Bool = false
     @Published var isRequestingAuthorization: Bool = false
     @Published var isTransitioningContent: Bool = false
+    @Published var isCupPickerActive: Bool = false
     private var clearTransitionTask: Task<Void, Never>?
     
     func setTransitioning() {
