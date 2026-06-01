@@ -150,9 +150,9 @@ struct WaterTrackerView: View {
     // MARK: - Endpoint Icons
 
     private var endpointIcons: some View {
-        let startRad = arcStartAngle * .pi / 180
-        let endRad = arcEndAngle * .pi / 180
-        let r = arcRadius + 8
+        let startRad = (arcStartAngle - 4) * .pi / 180
+        let endRad = (arcEndAngle + 4) * .pi / 180
+        let r = arcRadius
         return ZStack {
             Image(systemName: "sun.max.fill")
                 .font(.system(size: 11))
@@ -230,7 +230,7 @@ struct WaterTrackerView: View {
                     .foregroundStyle(.blue)
 
                 Circle()
-                    .fill(Color(white: 0.95))
+                    .fill(.white)
                     .frame(width: 14, height: 14)
                     .overlay(
                         Image(systemName: "arrow.trianglehead.2.circlepath")
