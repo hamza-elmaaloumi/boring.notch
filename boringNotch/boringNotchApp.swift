@@ -260,6 +260,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         )
 
         window.orderFrontRegardless()
+        viewModel.window = window
         NotchSpaceManager.shared.notchSpace.windows.insert(window)
 
         // Observe when the window's screen changes so we can update drag detectors

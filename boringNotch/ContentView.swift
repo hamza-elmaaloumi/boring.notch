@@ -44,6 +44,10 @@ struct ContentView: View {
     private let extendedHoverPadding: CGFloat = 30
     private let zeroHeightHoverPadding: CGFloat = 10
 
+    private var notchWindowHeight: CGFloat {
+        vm.notchState == .open ? vm.notchSize.height + shadowPadding : windowSize.height
+    }
+
     private var topCornerRadius: CGFloat {
        ((vm.notchState == .open) && Defaults[.cornerRadiusScaling])
                 ? cornerRadiusInsets.opened.top
@@ -120,12 +124,14 @@ struct ContentView: View {
                 
                 mainLayout
                     .frame(height: vm.notchState == .open ? vm.notchSize.height : nil, alignment: .top)
+                    .background(.black)
                     .conditionalModifier(true) { view in
                         let openAnimation = Animation.spring(response: 0.42, dampingFraction: 0.8, blendDuration: 0)
                         let closeAnimation = Animation.spring(response: 0.45, dampingFraction: 1.0, blendDuration: 0)
                         
                         return view
                             .animation(vm.notchState == .open ? openAnimation : closeAnimation, value: vm.notchState)
+                            .animation(.spring(response: 0.42, dampingFraction: 0.8), value: vm.notchSize)
                             .animation(.smooth, value: gestureProgress)
                     }
                     .contentShape(Rectangle())
@@ -204,7 +210,7 @@ struct ContentView: View {
             }
         }
         .padding(.bottom, 8)
-        .frame(maxWidth: windowSize.width, maxHeight: windowSize.height, alignment: .top)
+        .frame(maxWidth: windowSize.width, maxHeight: notchWindowHeight, alignment: .top)
         .compositingGroup()
         .scaleEffect(
             x: gestureScale,
@@ -215,6 +221,26 @@ struct ContentView: View {
         .background(dragDetector)
         .preferredColorScheme(.dark)
         .environmentObject(vm)
+        .onChange(of: coordinator.currentView) { _, newView in
+            let targetHeight: CGFloat = newView == .productivity ? 380 : openNotchSize.height
+            guard vm.openNotchHeight != targetHeight else { return }
+            vm.openNotchHeight = targetHeight
+
+            if vm.notchState == .open {
+                vm.notchSize = CGSize(width: openNotchSize.width, height: targetHeight)
+                if let window = vm.window {
+                    let newWindowHeight = targetHeight + shadowPadding
+                    let currentFrame = window.frame
+                    let newFrame = CGRect(
+                        x: currentFrame.origin.x,
+                        y: currentFrame.origin.y + (currentFrame.height - newWindowHeight),
+                        width: currentFrame.width,
+                        height: newWindowHeight
+                    )
+                    window.setFrame(newFrame, display: true, animate: true)
+                }
+            }
+        }
         .onChange(of: vm.anyDropZoneTargeting) { _, isTargeted in
             anyDropDebounceTask?.cancel()
 

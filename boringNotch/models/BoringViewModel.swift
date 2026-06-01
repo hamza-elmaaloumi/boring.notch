@@ -5,6 +5,7 @@
 //  Created by Harsh Vardhan  Goswami  on 04/08/24.
 //
 
+import AppKit
 import Combine
 import Defaults
 import SwiftUI
@@ -36,7 +37,10 @@ class BoringViewModel: NSObject, ObservableObject {
 
     @Published var notchSize: CGSize = getClosedNotchSize()
     @Published var closedNotchSize: CGSize = getClosedNotchSize()
-    
+    @Published var openNotchHeight: CGFloat = openNotchSize.height
+
+    weak var window: NSWindow?
+
     let webcamManager = WebcamManager.shared
     @Published var isCameraExpanded: Bool = false
     @Published var isRequestingAuthorization: Bool = false
@@ -190,15 +194,26 @@ class BoringViewModel: NSObject, ObservableObject {
     }
 
     func open() {
-        self.notchSize = openNotchSize
+        self.notchSize = CGSize(width: openNotchSize.width, height: openNotchHeight)
         self.notchState = .open
-        
-        // Force music information update when notch is opened
+
         MusicManager.shared.forceUpdate()
+
+        if let window = self.window {
+            let targetHeight = openNotchHeight + shadowPadding
+            guard abs(window.frame.height - targetHeight) > 1 else { return }
+            let currentFrame = window.frame
+            let newFrame = CGRect(
+                x: currentFrame.origin.x,
+                y: currentFrame.origin.y + (currentFrame.height - targetHeight),
+                width: currentFrame.width,
+                height: targetHeight
+            )
+            window.setFrame(newFrame, display: true, animate: true)
+        }
     }
 
     func close() {
-        // Do not close while a share picker or sharing service is active
         if SharingStateManager.shared.preventNotchClose {
             return
         }
@@ -208,6 +223,19 @@ class BoringViewModel: NSObject, ObservableObject {
         self.isBatteryPopoverActive = false
         self.coordinator.sneakPeek.show = false
         self.edgeAutoOpenActive = false
+
+        if let window = self.window {
+            let defaultHeight = windowSize.height
+            guard abs(window.frame.height - defaultHeight) > 1 else { return }
+            let currentFrame = window.frame
+            let newFrame = CGRect(
+                x: currentFrame.origin.x,
+                y: currentFrame.origin.y + (currentFrame.height - defaultHeight),
+                width: currentFrame.width,
+                height: defaultHeight
+            )
+            window.setFrame(newFrame, display: true, animate: true)
+        }
     }
 
     func closeHello() {
