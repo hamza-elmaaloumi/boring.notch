@@ -37,8 +37,7 @@ struct ProductivitySettingsContent: View {
     @AppStorage("dailyFocusGoalMinutes") private var dailyFocusGoal: Int = 120
     @AppStorage("drinkingReminderInterval") private var reminderInterval: Int = 96
     @AppStorage("allowRemindersDuringFocus") private var allowDuringFocus: Bool = false
-    @AppStorage("reminderQuietHoursStart") private var quietStart: Int = 8
-    @AppStorage("reminderQuietHoursEnd") private var quietEnd: Int = 0
+
 
     var body: some View {
         ScrollView {
@@ -153,17 +152,7 @@ struct ProductivitySettingsContent: View {
 
                         Toggle("Allow reminders during focus sessions", isOn: $allowDuringFocus)
 
-                        HStack {
-                            Text("Quiet hours start")
-                            Spacer()
-                            Stepper("\(quietStart):00", value: $quietStart, in: 0...23)
-                        }
-
-                        HStack {
-                            Text("Quiet hours end")
-                            Spacer()
-                            Stepper("\(quietEnd):00", value: $quietEnd, in: 0...23)
-                        }
+                        ActiveHoursSlider()
                     }
                     .padding()
                 }
