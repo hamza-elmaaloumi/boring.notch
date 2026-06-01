@@ -2,24 +2,24 @@ import SwiftUI
 import Defaults
 
 struct WaterWave: Shape {
-    var peakHeight: CGFloat = 24
+    var peakHeight: CGFloat = 32
 
     func path(in rect: CGRect) -> Path {
         Path { path in
-            let baseY = rect.height * 0.72
+            let baseY = rect.height * 0.7
             let peakY = baseY - peakHeight
             let midX = rect.width / 2
 
             path.move(to: CGPoint(x: 0, y: baseY))
             path.addCurve(
                 to: CGPoint(x: midX, y: peakY),
-                control1: CGPoint(x: rect.width * 0.22, y: baseY),
-                control2: CGPoint(x: rect.width * 0.42, y: peakY + 8)
+                control1: CGPoint(x: rect.width * 0.20, y: baseY),
+                control2: CGPoint(x: rect.width * 0.40, y: peakY - 4)
             )
             path.addCurve(
                 to: CGPoint(x: rect.width, y: baseY),
-                control1: CGPoint(x: rect.width * 0.58, y: peakY + 8),
-                control2: CGPoint(x: rect.width * 0.78, y: baseY)
+                control1: CGPoint(x: rect.width * 0.60, y: peakY - 4),
+                control2: CGPoint(x: rect.width * 0.80, y: baseY)
             )
             path.addLine(to: CGPoint(x: rect.width, y: rect.height))
             path.addLine(to: CGPoint(x: 0, y: rect.height))
@@ -88,11 +88,12 @@ struct WaterTrackerView: View {
         arcDiameter / 2
     }
 
-    private var endpointOffset: CGSize {
-        let angle: CGFloat = 20
-        let rad = angle * .pi / 180
-        let r = arcRadius + 14
-        return CGSize(width: r * cos(rad), height: r * sin(rad))
+    private var arcStartAngle: CGFloat {
+        arcRotation
+    }
+
+    private var arcEndAngle: CGFloat {
+        arcRotation + arcSpan * 360
     }
 
     var body: some View {
@@ -149,21 +150,24 @@ struct WaterTrackerView: View {
     // MARK: - Endpoint Icons
 
     private var endpointIcons: some View {
-        ZStack {
+        let startRad = arcStartAngle * .pi / 180
+        let endRad = arcEndAngle * .pi / 180
+        let r = arcRadius
+        return ZStack {
             Image(systemName: "sun.max.fill")
                 .font(.system(size: 11))
                 .foregroundStyle(.orange)
                 .position(
-                    x: center.x - endpointOffset.width,
-                    y: center.y + endpointOffset.height
+                    x: center.x + r * cos(startRad),
+                    y: center.y + r * sin(startRad)
                 )
 
             Image(systemName: "drop.fill")
                 .font(.system(size: 11))
                 .foregroundStyle(.blue)
                 .position(
-                    x: center.x + endpointOffset.width,
-                    y: center.y + endpointOffset.height
+                    x: center.x + r * cos(endRad),
+                    y: center.y + r * sin(endRad)
                 )
         }
     }
@@ -217,19 +221,25 @@ struct WaterTrackerView: View {
         } label: {
             ZStack {
                 Circle()
-                    .fill(Color(white: 0.2))
-                    .frame(width: 36, height: 36)
-                    .shadow(color: .white.opacity(0.08), radius: 3, x: 0, y: 2)
+                    .fill(.white)
+                    .frame(width: 40, height: 40)
+                    .shadow(color: .black.opacity(0.12), radius: 4, x: 0, y: 2)
 
-                HStack(spacing: 2) {
-                    Image(systemName: "waterbottle.fill")
-                        .font(.system(size: 10))
-                        .foregroundStyle(.blue)
-                    Image(systemName: "arrow.trianglehead.2.circlepath")
-                        .font(.system(size: 8))
-                        .foregroundStyle(.blue)
-                }
+                Image(systemName: "waterbottle.fill")
+                    .font(.system(size: 18))
+                    .foregroundStyle(.blue)
+
+                Circle()
+                    .fill(Color(white: 0.95))
+                    .frame(width: 14, height: 14)
+                    .overlay(
+                        Image(systemName: "arrow.trianglehead.2.circlepath")
+                            .font(.system(size: 8, weight: .bold))
+                            .foregroundStyle(.blue)
+                    )
+                    .position(x: 34, y: 34)
             }
+            .frame(width: 40, height: 40)
         }
         .buttonStyle(PlainButtonStyle())
         .position(
