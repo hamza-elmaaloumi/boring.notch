@@ -2,13 +2,24 @@ import SwiftUI
 import Defaults
 
 struct WaterWave: Shape {
+    var peakHeight: CGFloat = 24
+
     func path(in rect: CGRect) -> Path {
         Path { path in
-            let waveTopY = rect.height * 0.72
-            path.move(to: CGPoint(x: 0, y: waveTopY))
-            path.addQuadCurve(
-                to: CGPoint(x: rect.width, y: waveTopY),
-                control: CGPoint(x: rect.width * 0.5, y: waveTopY - 14)
+            let baseY = rect.height * 0.72
+            let peakY = baseY - peakHeight
+            let midX = rect.width / 2
+
+            path.move(to: CGPoint(x: 0, y: baseY))
+            path.addCurve(
+                to: CGPoint(x: midX, y: peakY),
+                control1: CGPoint(x: rect.width * 0.22, y: baseY),
+                control2: CGPoint(x: rect.width * 0.42, y: peakY + 8)
+            )
+            path.addCurve(
+                to: CGPoint(x: rect.width, y: baseY),
+                control1: CGPoint(x: rect.width * 0.58, y: peakY + 8),
+                control2: CGPoint(x: rect.width * 0.78, y: baseY)
             )
             path.addLine(to: CGPoint(x: rect.width, y: rect.height))
             path.addLine(to: CGPoint(x: 0, y: rect.height))
@@ -19,10 +30,11 @@ struct WaterWave: Shape {
 
 struct WaterGlassIcon: View {
     let filled: Bool
+    var iconName: String = "waterbottle.fill"
 
     var body: some View {
         ZStack {
-            Image(systemName: "waterbottle.fill")
+            Image(systemName: iconName)
                 .font(.system(size: 22))
                 .foregroundStyle(filled ? .blue : .blue.opacity(0.4))
 
@@ -186,7 +198,7 @@ struct WaterTrackerView: View {
     private var quickAddButton: some View {
         VStack(spacing: 3) {
             Button(action: incrementWater) {
-                WaterGlassIcon(filled: true)
+                WaterGlassIcon(filled: true, iconName: currentCup.shape.icon)
             }
             .buttonStyle(PlainButtonStyle())
 
@@ -194,7 +206,7 @@ struct WaterTrackerView: View {
                 .font(.system(size: 11, weight: .bold, design: .rounded))
                 .foregroundStyle(Color(red: 0.247, green: 0.663, blue: 0.988))
         }
-        .offset(y: innerDiameter * 0.28)
+        .offset(x: -6, y: innerDiameter * 0.2)
     }
 
     // MARK: - Auxiliary Button
