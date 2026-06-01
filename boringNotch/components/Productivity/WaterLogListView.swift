@@ -5,7 +5,7 @@ struct WaterLogListView: View {
 
     private static let timeFormatter: DateFormatter = {
         let f = DateFormatter()
-        f.dateFormat = "hh:mm a"
+        f.dateFormat = "HH:mm"
         return f
     }()
 
