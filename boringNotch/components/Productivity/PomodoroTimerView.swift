@@ -225,15 +225,20 @@ struct PomodoroTimerView: View {
         return String(format: "%02d:%02d", minutes, seconds)
     }
 
-    private var todaySummary: String {
+    private var todaySummaryText: some View {
         let total = ProductivityDataStore.shared.totalFocusTimeToday()
         let hours = total / 3600
         let minutes = (total % 3600) / 60
-        if hours > 0 {
-            return "Today: \(hours)h \(minutes)m focused"
-        } else {
-            return "Today: \(minutes)m focused"
+        let accent = Color(red: 0.247, green: 0.663, blue: 0.988)
+        return Group {
+            if hours > 0 {
+                Text("Today: ") + Text("\(hours)h \(minutes)m").foregroundColor(accent) + Text(" focused")
+            } else {
+                Text("Today: ") + Text("\(minutes)m").foregroundColor(accent) + Text(" focused")
+            }
         }
+        .font(.caption2)
+        .foregroundColor(.secondary)
     }
 
     var body: some View {
@@ -253,9 +258,7 @@ struct PomodoroTimerView: View {
                 .font(.system(size: 34, weight: .bold, design: .monospaced))
                 .monospacedDigit()
 
-            Text(todaySummary)
-                .font(.caption2)
-                .foregroundColor(.secondary)
+            todaySummaryText
 
             HStack(spacing: 14) {
                 Button(action: timerStore.toggleTimer) {

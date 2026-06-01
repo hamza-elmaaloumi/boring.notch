@@ -229,15 +229,15 @@ struct WaterTrackerView: View {
                     .font(.system(size: 16))
                     .foregroundStyle(.blue)
 
-                Circle()
-                    .fill(.white)
-                    .frame(width: 14, height: 14)
-                    .overlay(
-                        Image(systemName: "arrow.trianglehead.2.circlepath")
-                            .font(.system(size: 8, weight: .bold))
-                            .foregroundStyle(.blue)
-                    )
-                    .position(x: 34, y: 34)
+                ZStack {
+                    Circle()
+                        .fill(.white)
+                        .frame(width: 18, height: 18)
+                    Image(systemName: "arrow.trianglehead.2.circlepath")
+                        .font(.system(size: 10, weight: .black))
+                        .foregroundStyle(.blue)
+                }
+                .position(x: 36, y: 36)
             }
             .frame(width: 40, height: 40)
         }

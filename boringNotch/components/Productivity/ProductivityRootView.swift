@@ -7,6 +7,7 @@ struct ProductivityRootView: View {
                 PomodoroTimerView()
                 Divider()
                 WaterTrackerView()
+                WaterLogListView()
             }
             .padding(.horizontal, 12)
             .padding(.top, 4)
