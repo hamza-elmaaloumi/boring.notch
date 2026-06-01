@@ -222,6 +222,7 @@ struct ContentView: View {
         .preferredColorScheme(.dark)
         .environmentObject(vm)
         .onChange(of: coordinator.currentView) { _, newView in
+            hoverTask?.cancel()
             let targetHeight: CGFloat = newView == .productivity ? 380 : openNotchSize.height
             guard vm.openNotchHeight != targetHeight else { return }
             vm.openNotchHeight = targetHeight
@@ -237,7 +238,7 @@ struct ContentView: View {
                         width: currentFrame.width,
                         height: newWindowHeight
                     )
-                    window.setFrame(newFrame, display: true, animate: true)
+                    window.setFrame(newFrame, display: true, animate: false)
                 }
             }
         }

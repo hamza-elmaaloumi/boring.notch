@@ -78,7 +78,7 @@ struct WaterTrackerView: View {
     private var endpointOffset: CGSize {
         let angle: CGFloat = 20
         let rad = angle * .pi / 180
-        let r = arcRadius + 6
+        let r = arcRadius + 14
         return CGSize(width: r * cos(rad), height: r * sin(rad))
     }
 
@@ -108,7 +108,7 @@ struct WaterTrackerView: View {
     private var arcTrack: some View {
         Circle()
             .trim(from: 0, to: arcSpan)
-            .stroke(Color.gray.opacity(0.15), style: StrokeStyle(lineWidth: 3, lineCap: .round))
+            .stroke(Color.white.opacity(0.12), style: StrokeStyle(lineWidth: 3, lineCap: .round))
             .rotationEffect(.degrees(arcRotation))
             .frame(width: arcDiameter, height: arcDiameter)
     }
@@ -126,9 +126,8 @@ struct WaterTrackerView: View {
 
     private var innerCard: some View {
         Circle()
-            .fill(.white)
+            .fill(Color(white: 0.12))
             .frame(width: innerDiameter, height: innerDiameter)
-            .shadow(color: .black.opacity(0.08), radius: 6, x: 0, y: 4)
     }
 
     // MARK: - Endpoint Icons
@@ -143,18 +142,13 @@ struct WaterTrackerView: View {
                     y: center.y + endpointOffset.height
                 )
 
-            HStack(spacing: 2) {
-                Image(systemName: "drop.fill")
-                    .font(.system(size: 11))
-                    .foregroundStyle(.blue)
-                Image(systemName: "sparkles")
-                    .font(.system(size: 7))
-                    .foregroundStyle(.blue)
-            }
-            .position(
-                x: center.x + endpointOffset.width,
-                y: center.y + endpointOffset.height
-            )
+            Image(systemName: "drop.fill")
+                .font(.system(size: 11))
+                .foregroundStyle(.blue)
+                .position(
+                    x: center.x + endpointOffset.width,
+                    y: center.y + endpointOffset.height
+                )
         }
     }
 
@@ -168,7 +162,7 @@ struct WaterTrackerView: View {
                     .foregroundStyle(Color(red: 0.247, green: 0.663, blue: 0.988))
                 Text("/\(max(1, waterGoal))ml")
                     .font(.system(size: 26, weight: .medium, design: .rounded))
-                    .foregroundStyle(.gray)
+                    .foregroundStyle(Color(white: 0.5))
             }
         }
         .offset(y: -12)
@@ -178,7 +172,7 @@ struct WaterTrackerView: View {
 
     private var waterWave: some View {
         WaterWave()
-            .fill(Color(red: 0.851, green: 0.918, blue: 0.992))
+            .fill(Color(red: 0.2, green: 0.35, blue: 0.55))
             .frame(width: innerDiameter, height: innerDiameter)
             .clipShape(Circle())
     }
@@ -207,9 +201,9 @@ struct WaterTrackerView: View {
         } label: {
             ZStack {
                 Circle()
-                    .fill(.white)
+                    .fill(Color(white: 0.2))
                     .frame(width: 36, height: 36)
-                    .shadow(color: .black.opacity(0.1), radius: 3, x: 0, y: 2)
+                    .shadow(color: .white.opacity(0.08), radius: 3, x: 0, y: 2)
 
                 HStack(spacing: 2) {
                     Image(systemName: "waterbottle.fill")
