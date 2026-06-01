@@ -22,14 +22,6 @@ struct WaterDashboardView: View {
 
     var body: some View {
         VStack {
-            Picker("", selection: $selectedPeriod) {
-                Text("Daily").tag("daily")
-                Text("Weekly").tag("weekly")
-                Text("Monthly").tag("monthly")
-            }
-            .pickerStyle(SegmentedPickerStyle())
-            .padding(.horizontal)
-
             switch selectedPeriod {
             case "daily":
                 dailyView
@@ -40,6 +32,14 @@ struct WaterDashboardView: View {
             default:
                 dailyView
             }
+
+            Picker("", selection: $selectedPeriod) {
+                Text("Daily").tag("daily")
+                Text("Weekly").tag("weekly")
+                Text("Monthly").tag("monthly")
+            }
+            .pickerStyle(SegmentedPickerStyle())
+            .padding(.horizontal)
         }
     }
 

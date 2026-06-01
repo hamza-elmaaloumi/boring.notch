@@ -148,3 +148,44 @@ Add new settings with `@AppStorage` keys:
 - [ ] **Step 7:** Create `ProductivityDashboardView.swift` — root container with 3-way segmented picker
 - [ ] **Step 8:** Update `ProductivitySettingsView.swift` — add segmented picker (Settings / Dashboard) + new settings fields
 - [ ] **Step 9:** Run `ruby update_prod_pbxproj.rb` after all new files are created
+
+---
+
+## Dashboard UI changes
+
+### Goal
+Clean up the dashboard layout based on feedback:
+1. Remove the Combined diagram entirely
+2. Show Pomodoro and Water diagrams stacked vertically (no switching toggle)
+3. Move each diagram's Daily/Weekly/Monthly picker from top to bottom
+
+### Files to modify
+
+#### `boringNotch/components/Productivity/Dashboard/CombinedDashboardView.swift`
+- **Action:** Delete the file entirely
+- Reason: Combined (scatter/relationship) view is not wanted
+
+#### `boringNotch/components/Productivity/Dashboard/ProductivityDashboardView.swift`
+- **Action:** Rewrite body
+  - Remove `@State private var selectedDashboard` and the `Picker`
+  - Replace with a simple `VStack(spacing: 16)` (or `ScrollView` if content overflows)
+  - Top: `PomodoroDashboardView()`
+  - Bottom: `WaterDashboardView()`
+- No structure changes needed inside PomodoroDashboardView or WaterDashboardView — they remain independent
+
+#### `boringNotch/components/Productivity/Dashboard/PomodoroDashboardView.swift`
+- **Action:** Move the `Picker` (Daily / Weekly / Monthly) from the top of the `VStack` to the very bottom
+- The `Picker` currently sits at lines 11-17. Move it after the `switch selectedPeriod { ... }` block
+- Visually: chart content first → picker below it
+
+#### `boringNotch/components/Productivity/Dashboard/WaterDashboardView.swift`
+- **Action:** Same as PomodoroDashboardView — move the `Picker` from top to bottom
+- The `Picker` currently sits at lines 25-31. Move it after the `switch selectedPeriod { ... }` block
+
+### Execution to-do list
+
+- [ ] **Step A:** Delete `CombinedDashboardView.swift`
+- [ ] **Step B:** Rewrite `ProductivityDashboardView.swift` — remove picker, stack Pomodoro + Water vertically
+- [ ] **Step C:** Move period picker to bottom in `PomodoroDashboardView.swift`
+- [ ] **Step D:** Move period picker to bottom in `WaterDashboardView.swift`
+- [ ] **Step E:** Verify — build the project

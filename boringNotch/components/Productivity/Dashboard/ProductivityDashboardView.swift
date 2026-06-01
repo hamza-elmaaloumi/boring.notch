@@ -1,28 +1,14 @@
 import SwiftUI
 
 struct ProductivityDashboardView: View {
-    @State private var selectedDashboard: String = "pomodoro"
-
     var body: some View {
-        VStack(spacing: 0) {
-            Picker("", selection: $selectedDashboard) {
-                Text("Pomodoro").tag("pomodoro")
-                Text("Water").tag("water")
-                Text("Combined").tag("combined")
-            }
-            .pickerStyle(SegmentedPickerStyle())
-            .padding()
-
-            switch selectedDashboard {
-            case "pomodoro":
+        ScrollView {
+            VStack(spacing: 24) {
                 PomodoroDashboardView()
-            case "water":
+                Divider()
                 WaterDashboardView()
-            case "combined":
-                CombinedDashboardView()
-            default:
-                PomodoroDashboardView()
             }
+            .padding()
         }
     }
 }
