@@ -39,22 +39,29 @@ struct ActiveHoursSlider: View {
                         .fill(Color.white)
                         .frame(width: 24, height: 24)
                         .shadow(color: .black.opacity(0.12), radius: 3)
-                        .offset(x: startPos / 24.0 * trackWidth - 12)
-                        .gesture(DragGesture(minimumDistance: 0).onChanged { value in
-                            let pos = min(max(0, value.location.x / trackWidth * 24), 24)
-                            startHour = min(Int(pos), 23)
-                        })
+                        .position(x: startPos / 24.0 * trackWidth, y: 15)
 
                     Circle()
                         .fill(Color.white)
                         .frame(width: 24, height: 24)
                         .shadow(color: .black.opacity(0.12), radius: 3)
-                        .offset(x: endPos / 24.0 * trackWidth - 12)
-                        .gesture(DragGesture(minimumDistance: 0).onChanged { value in
-                            let pos = min(max(0, value.location.x / trackWidth * 24), 24)
-                            endHour = Int(pos) == 24 ? 0 : Int(pos)
-                        })
+                        .position(x: endPos / 24.0 * trackWidth, y: 15)
                 }
+                .contentShape(Rectangle())
+                .highPriorityGesture(
+                    DragGesture(minimumDistance: 0)
+                        .onChanged { value in
+                            let raw = value.location.x / trackWidth * 24
+                            let pos = min(max(0, raw), 24)
+                            let startDist = abs(pos - startPos)
+                            let endDist = abs(pos - endPos)
+                            if startDist <= endDist {
+                                startHour = min(Int(pos), 23)
+                            } else {
+                                endHour = Int(pos) == 24 ? 0 : Int(pos)
+                            }
+                        }
+                )
             }
             .frame(height: 30)
 
