@@ -39,7 +39,12 @@ struct ProductivitySettingsContent: View {
     @Default(.userHeight) var userHeight
     @Default(.userWeight) var userWeight
     @Default(.autoCalculateWaterGoal) var autoCalculateWaterGoal
-    @Default(.customCupAmount) var customCupAmount
+
+    private var currentCupInfo: (icon: String, label: String) {
+        let cup = WaterCup.predefinedCups[Defaults[.selectedCupIndex]]
+        let ml = cup.isCustom ? Defaults[.customCupAmount] : cup.amount
+        return (cup.shape.icon, "\(ml) ml")
+    }
 
     var body: some View {
         ScrollView {
@@ -124,11 +129,12 @@ struct ProductivitySettingsContent: View {
                         }
 
                         HStack {
-                            Text("Custom Cup Amount (ml)")
+                            Text("Default Cup")
                             Spacer()
-                            TextField("Amount", value: $customCupAmount, formatter: NumberFormatter())
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
-                                .frame(width: 80)
+                            Image(systemName: currentCupInfo.icon)
+                                .foregroundStyle(.blue)
+                            Text(currentCupInfo.label)
+                                .foregroundStyle(.secondary)
                         }
                     }
                     .padding()

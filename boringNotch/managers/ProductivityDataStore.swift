@@ -85,12 +85,7 @@ class ProductivityDataStore: ObservableObject {
     }
     
     func calculateWaterGoal(height: Double, weight: Double) -> Int {
-        // Standard formula: Weight (kg) * 35 ml
-        // Adjusted for height (proxy for surface area/metabolism)
-        let baseline = weight * 35
-        let heightAdjustment = (height - 170) * 5
-        let total = Int(baseline + heightAdjustment)
-        // Keep it within reasonable bounds
+        let total = Int(weight * 35)
         return max(1000, min(5000, total))
     }
     

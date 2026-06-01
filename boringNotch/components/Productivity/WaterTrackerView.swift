@@ -11,6 +11,8 @@ struct WaterTrackerView: View {
     @Default(.userWeight) var userWeight
     @Default(.autoCalculateWaterGoal) var autoCalculateWaterGoal
 
+    @State private var showCupPicker = false
+
     private var currentCup: WaterCup {
         var cup = WaterCup.predefinedCups[selectedCupIndex]
         if cup.isCustom {
@@ -27,7 +29,6 @@ struct WaterTrackerView: View {
     var body: some View {
         VStack(spacing: 12) {
             ZStack {
-                // Background Illustration Placeholder
                 Image(systemName: "person.fill")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
@@ -35,7 +36,6 @@ struct WaterTrackerView: View {
                     .foregroundStyle(.blue.opacity(0.05))
                     .offset(y: 5)
                 
-                // Circular Progress
                 Circle()
                     .stroke(Color.white.opacity(0.1), lineWidth: 8)
                     .frame(width: 140, height: 140)
@@ -54,7 +54,6 @@ struct WaterTrackerView: View {
                     .rotationEffect(.degrees(-90))
                     .animation(.spring(response: 0.6, dampingFraction: 0.8), value: fillPercentage)
                 
-                // Progress Text
                 VStack(spacing: 2) {
                     HStack(alignment: .firstTextBaseline, spacing: 0) {
                         Text("\(waterConsumed)")
@@ -66,7 +65,6 @@ struct WaterTrackerView: View {
                     }
                 }
                 
-                // Icons on the circle (similar to reference)
                 HStack {
                     Image(systemName: "heart.break.fill")
                         .foregroundStyle(.gray.opacity(0.5))
@@ -78,7 +76,7 @@ struct WaterTrackerView: View {
                 }
                 .frame(width: 140)
 
-                // Increment Button (Cup)
+                // Increment Button
                 VStack {
                     Spacer()
                     Button(action: incrementWater) {
@@ -88,14 +86,13 @@ struct WaterTrackerView: View {
                                     .fill(Color.blue.opacity(0.15))
                                     .frame(width: 50, height: 50)
                                 
-                                Image(systemName: currentCup.icon)
+                                Image(systemName: currentCup.shape.icon)
                                     .font(.system(size: 20))
                                     .foregroundStyle(.blue)
                                 
                                 Image(systemName: "plus")
                                     .font(.system(size: 10, weight: .bold))
                                     .foregroundStyle(.white)
-                                    .offset(x: 0, y: 0)
                             }
                             
                             Text("\(currentCup.amount) ml")
@@ -107,22 +104,13 @@ struct WaterTrackerView: View {
                     .offset(y: 45)
                 }
                 
-                // Cup Switcher
+                // Cup Switcher (Popover)
                 VStack {
                     Spacer()
                     HStack {
                         Spacer()
-                        Menu {
-                            ForEach(WaterCup.predefinedCups) { cup in
-                                Button {
-                                    selectedCupIndex = cup.id
-                                } label: {
-                                    HStack {
-                                        Image(systemName: cup.icon)
-                                        Text(cup.isCustom ? "Custom (\(customCupAmount)ml)" : "\(cup.name) (\(cup.amount)ml)")
-                                    }
-                                }
-                            }
+                        Button {
+                            showCupPicker = true
                         } label: {
                             ZStack {
                                 Circle()
@@ -134,9 +122,15 @@ struct WaterTrackerView: View {
                                     .foregroundStyle(.white.opacity(0.6))
                             }
                         }
-                        .menuStyle(BorderlessButtonMenuStyle())
+                        .buttonStyle(PlainButtonStyle())
                         .frame(width: 32, height: 32)
                         .offset(x: 60, y: 30)
+                        .popover(isPresented: $showCupPicker) {
+                            CupPickerView(
+                                selectedCupIndex: $selectedCupIndex,
+                                customCupAmount: $customCupAmount
+                            )
+                        }
                     }
                 }
             }

@@ -59,24 +59,54 @@ enum SneakPeekStyle: String, CaseIterable, Identifiable, Defaults.Serializable {
     var id: String { self.rawValue }
 }
 
+enum WaterCupShape: String, Codable, CaseIterable {
+    case cup
+    case mug
+    case glass
+    case bottle
+    case largeBottle
+    case pitcher
+
+    var icon: String {
+        switch self {
+        case .cup: "cup.and.saucer.fill"
+        case .mug: "mug.fill"
+        case .glass: "wineglass.fill"
+        case .bottle: "waterbottle.fill"
+        case .largeBottle: "takeoutbag.and.cup.and.straw.fill"
+        case .pitcher: "cylinder.fill"
+        }
+    }
+
+    var displayName: String {
+        switch self {
+        case .cup: "Cup"
+        case .mug: "Mug"
+        case .glass: "Glass"
+        case .bottle: "Bottle"
+        case .largeBottle: "Large Bottle"
+        case .pitcher: "Pitcher"
+        }
+    }
+}
+
 struct WaterCup: Codable, Hashable, Identifiable {
     let id: Int
     let name: String
-    let icon: String
-    var amount: Int // in ml
+    let shape: WaterCupShape
+    var amount: Int
     let isCustom: Bool
 }
 
 extension WaterCup {
     static let predefinedCups: [WaterCup] = [
-        WaterCup(id: 0, name: "Small Cup", icon: "cup.and.saucer.fill", amount: 100, isCustom: false),
-        WaterCup(id: 1, name: "Medium Cup", icon: "mug.fill", amount: 200, isCustom: false),
-        WaterCup(id: 2, name: "Large Cup", icon: "drop.fill", amount: 300, isCustom: false),
-        WaterCup(id: 3, name: "Small Bottle", icon: "plus.app.fill", amount: 500, isCustom: false),
-        WaterCup(id: 4, name: "Medium Bottle", icon: "fuelpump.fill", amount: 750, isCustom: false),
-        WaterCup(id: 5, name: "Large Bottle", icon: "wineglass.fill", amount: 1000, isCustom: false),
-        WaterCup(id: 6, name: "Extra Large Bottle", icon: "vial.viewfinder", amount: 1500, isCustom: false),
-        WaterCup(id: 7, name: "Custom", icon: "plus.circle.fill", amount: 250, isCustom: true)
+        WaterCup(id: 0, name: "Small Cup", shape: .cup, amount: 150, isCustom: false),
+        WaterCup(id: 1, name: "Mug", shape: .mug, amount: 250, isCustom: false),
+        WaterCup(id: 2, name: "Tall Glass", shape: .glass, amount: 350, isCustom: false),
+        WaterCup(id: 3, name: "Water Bottle", shape: .bottle, amount: 500, isCustom: false),
+        WaterCup(id: 4, name: "Large Bottle", shape: .largeBottle, amount: 750, isCustom: false),
+        WaterCup(id: 5, name: "Pitcher", shape: .pitcher, amount: 1000, isCustom: false),
+        WaterCup(id: 6, name: "Custom", shape: .cup, amount: 250, isCustom: true)
     ]
 }
 
