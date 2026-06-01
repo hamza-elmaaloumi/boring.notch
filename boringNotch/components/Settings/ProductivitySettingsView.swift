@@ -1,4 +1,5 @@
 import SwiftUI
+import Defaults
 
 struct ProductivitySettingsView: View {
     @State private var selectedTab: String = "settings"
@@ -31,13 +32,14 @@ struct ProductivitySettingsContent: View {
     @AppStorage("pomodoroLongBreak") private var pomodoroLongBreak: Int = 15
 
     @AppStorage("waterGoal") private var waterGoal: Int = 2000
-    @AppStorage("waterIncrement") private var waterIncrement: Int = 200
-    @AppStorage("waterUnit") private var waterUnit: String = "ml"
-
     @AppStorage("dailyFocusGoalMinutes") private var dailyFocusGoal: Int = 120
     @AppStorage("drinkingReminderInterval") private var reminderInterval: Int = 96
     @AppStorage("allowRemindersDuringFocus") private var allowDuringFocus: Bool = false
-
+    
+    @Default(.userHeight) var userHeight
+    @Default(.userWeight) var userWeight
+    @Default(.autoCalculateWaterGoal) var autoCalculateWaterGoal
+    @Default(.customCupAmount) var customCupAmount
 
     var body: some View {
         ScrollView {
@@ -81,41 +83,52 @@ struct ProductivitySettingsContent: View {
                     .padding()
                 }
 
+                GroupBox(label: Text("Biometrics (for Hydration Goal)").font(.headline)) {
+                    VStack(spacing: 15) {
+                        HStack {
+                            Text("Height (cm)")
+                            Spacer()
+                            TextField("cm", value: $userHeight, formatter: NumberFormatter())
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                                .frame(width: 80)
+                        }
+
+                        HStack {
+                            Text("Weight (kg)")
+                            Spacer()
+                            TextField("kg", value: $userWeight, formatter: NumberFormatter())
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                                .frame(width: 80)
+                        }
+                        
+                        Toggle("Auto-calculate water goal", isOn: $autoCalculateWaterGoal)
+                    }
+                    .padding()
+                }
+
                 GroupBox(label: Text("Hydration Tracker").font(.headline)) {
                     VStack(spacing: 15) {
                         HStack {
-                            Text("Daily Goal")
+                            Text("Daily Goal (ml)")
                             Spacer()
                             TextField("Amount", value: $waterGoal, formatter: NumberFormatter())
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
                                 .frame(width: 80)
+                                .disabled(autoCalculateWaterGoal)
+                        }
+                        
+                        if autoCalculateWaterGoal {
+                            Text("Goal is automatically calculated based on biometrics.")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
                         }
 
                         HStack {
-                            Text("Increment Amount")
+                            Text("Custom Cup Amount (ml)")
                             Spacer()
-                            TextField("Amount", value: $waterIncrement, formatter: NumberFormatter())
+                            TextField("Amount", value: $customCupAmount, formatter: NumberFormatter())
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
                                 .frame(width: 80)
-                        }
-
-                        HStack {
-                            Text("Measurement Unit")
-                            Spacer()
-                            Picker("", selection: $waterUnit) {
-                                Text("ml").tag("ml")
-                                Text("cups").tag("cups")
-                            }
-                            .frame(width: 100)
-                            .onChange(of: waterUnit) { _, unit in
-                                if unit == "cups" {
-                                    waterGoal = 8
-                                    waterIncrement = 1
-                                } else {
-                                    waterGoal = 2000
-                                    waterIncrement = 200
-                                }
-                            }
                         }
                     }
                     .padding()
@@ -137,19 +150,6 @@ struct ProductivitySettingsContent: View {
                                 }
                         }
 
-                        HStack {
-                            Text("Auto-calculated from goal")
-                            Spacer()
-                            Button("Recalculate") {
-                                DrinkingReminderManager.shared.recalculateInterval(
-                                    dailyGoal: waterGoal,
-                                    increment: waterIncrement
-                                )
-                                reminderInterval = DrinkingReminderManager.shared.intervalMinutes
-                            }
-                            .buttonStyle(.link)
-                        }
-
                         Toggle("Allow reminders during focus sessions", isOn: $allowDuringFocus)
 
                         ActiveHoursSlider()
@@ -161,12 +161,14 @@ struct ProductivitySettingsContent: View {
             }
             .padding(30)
         }
-        .onAppear {
-            if waterUnit != "ml" && waterUnit != "cups" {
-                waterUnit = "ml"
-                waterGoal = 2000
-                waterIncrement = 200
-            }
+        .onChange(of: userHeight) { updateGoal() }
+        .onChange(of: userWeight) { updateGoal() }
+        .onChange(of: autoCalculateWaterGoal) { updateGoal() }
+    }
+    
+    private func updateGoal() {
+        if autoCalculateWaterGoal {
+            waterGoal = ProductivityDataStore.shared.calculateWaterGoal(height: userHeight, weight: userWeight)
         }
     }
 }

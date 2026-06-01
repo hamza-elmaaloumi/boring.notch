@@ -1,5 +1,6 @@
 import Combine
 import Foundation
+import Defaults
 
 @MainActor
 class ProductivityDataStore: ObservableObject {
@@ -76,6 +77,21 @@ class ProductivityDataStore: ObservableObject {
     private func performDailyReset() {
         UserDefaults.standard.set(0, forKey: "waterConsumed")
         UserDefaults.standard.set(Calendar.current.startOfDay(for: Date()), forKey: lastResetDateKey)
+        
+        if Defaults[.autoCalculateWaterGoal] {
+            let goal = calculateWaterGoal(height: Defaults[.userHeight], weight: Defaults[.userWeight])
+            UserDefaults.standard.set(goal, forKey: "waterGoal")
+        }
+    }
+    
+    func calculateWaterGoal(height: Double, weight: Double) -> Int {
+        // Standard formula: Weight (kg) * 35 ml
+        // Adjusted for height (proxy for surface area/metabolism)
+        let baseline = weight * 35
+        let heightAdjustment = (height - 170) * 5
+        let total = Int(baseline + heightAdjustment)
+        // Keep it within reasonable bounds
+        return max(1000, min(5000, total))
     }
     
     func saveFocusSession(_ session: FocusSession) {

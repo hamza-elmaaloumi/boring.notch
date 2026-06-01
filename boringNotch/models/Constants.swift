@@ -59,6 +59,27 @@ enum SneakPeekStyle: String, CaseIterable, Identifiable, Defaults.Serializable {
     var id: String { self.rawValue }
 }
 
+struct WaterCup: Codable, Hashable, Identifiable {
+    let id: Int
+    let name: String
+    let icon: String
+    var amount: Int // in ml
+    let isCustom: Bool
+}
+
+extension WaterCup {
+    static let predefinedCups: [WaterCup] = [
+        WaterCup(id: 0, name: "Small Cup", icon: "cup.and.saucer.fill", amount: 100, isCustom: false),
+        WaterCup(id: 1, name: "Medium Cup", icon: "mug.fill", amount: 200, isCustom: false),
+        WaterCup(id: 2, name: "Large Cup", icon: "drop.fill", amount: 300, isCustom: false),
+        WaterCup(id: 3, name: "Small Bottle", icon: "plus.app.fill", amount: 500, isCustom: false),
+        WaterCup(id: 4, name: "Medium Bottle", icon: "fuelpump.fill", amount: 750, isCustom: false),
+        WaterCup(id: 5, name: "Large Bottle", icon: "wineglass.fill", amount: 1000, isCustom: false),
+        WaterCup(id: 6, name: "Extra Large Bottle", icon: "vial.viewfinder", amount: 1500, isCustom: false),
+        WaterCup(id: 7, name: "Custom", icon: "plus.circle.fill", amount: 250, isCustom: true)
+    ]
+}
+
 // Action to perform when Option (⌥) is held while pressing media keys
 enum OptionKeyAction: String, CaseIterable, Identifiable, Defaults.Serializable {
     case openSettings = "Open System Settings"
@@ -75,6 +96,10 @@ extension Defaults.Keys {
     static let automaticallySwitchDisplay = Key<Bool>("automaticallySwitchDisplay", default: true)
     static let releaseName = Key<String>("releaseName", default: "Flying Rabbit 🐇🪽")
     
+    // MARK: User Info
+    static let userHeight = Key<Double>("userHeight", default: 170.0) // cm
+    static let userWeight = Key<Double>("userWeight", default: 70.0) // kg
+
     // MARK: Behavior
     static let minimumHoverDuration = Key<TimeInterval>("minimumHoverDuration", default: 0.3)
     static let enableHaptics = Key<Bool>("enableHaptics", default: true)
@@ -171,6 +196,11 @@ extension Defaults.Keys {
     static let autoRemoveShelfItems = Key<Bool>("autoRemoveShelfItems", default: false)
     static let expandedDragDetection = Key<Bool>("expandedDragDetection", default: true)
     
+    // MARK: Productivity
+    static let autoCalculateWaterGoal = Key<Bool>("autoCalculateWaterGoal", default: true)
+    static let selectedCupIndex = Key<Int>("selectedCupIndex", default: 1) // Default to Medium Cup
+    static let customCupAmount = Key<Int>("customCupAmount", default: 250)
+
     // MARK: Calendar
     static let calendarSelectionState = Key<CalendarSelectionState>("calendarSelectionState", default: .all)
     static let hideAllDayEvents = Key<Bool>("hideAllDayEvents", default: false)

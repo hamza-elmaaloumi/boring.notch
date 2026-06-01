@@ -4,22 +4,16 @@ import SwiftUI
 struct WaterDashboardView: View {
     @ObservedObject private var dataStore = ProductivityDataStore.shared
     @AppStorage("waterGoal") private var waterGoal: Int = 2000
-    @AppStorage("waterUnit") private var waterUnit: String = "ml"
     @State private var selectedPeriod: String = "daily"
     @State private var hoveredLog: (time: Date, amount: Int)?
     @State private var hoveredDay: (day: String, ml: Int)?
 
-    private let mlPerCup: Double = 236.588
-
     private func displayMl(_ ml: Int) -> String {
-        if waterUnit == "cups" {
-            return String(format: "%.1f", Double(ml) / mlPerCup)
-        }
         return "\(ml)"
     }
 
     private func unitLabel() -> String {
-        waterUnit
+        "ml"
     }
 
     var body: some View {
