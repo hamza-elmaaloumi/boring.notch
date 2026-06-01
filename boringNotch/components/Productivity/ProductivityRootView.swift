@@ -2,18 +2,16 @@ import SwiftUI
 
 struct ProductivityRootView: View {
     var body: some View {
-        ScrollView(.horizontal) {
-            HStack(alignment: .top, spacing: 12) {
-                PomodoroTimerView()
-                Divider()
-                WaterTrackerView()
-                WaterLogListView()
-                    .offset(x: -8)
-            }
-            .padding(.horizontal, 12)
-            .padding(.top, 4)
-            .padding(.bottom, 10)
+        HStack(alignment: .top, spacing: 12) {
+            PomodoroTimerView()
+                .frame(width: 130)
+            Divider()
+            WaterTrackerView()
+            WaterLogListView()
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .scrollIndicators(.hidden)
+        .padding(.horizontal, 12)
+        .padding(.top, 4)
+        .padding(.bottom, 10)
     }
 }

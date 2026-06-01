@@ -3,8 +3,18 @@ import SwiftUI
 struct WaterLogListView: View {
     @ObservedObject var store: ProductivityDataStore = .shared
 
+    private static let timeFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "hh:mm a"
+        return f
+    }()
+
+    private func formattedTime(_ date: Date) -> String {
+        Self.timeFormatter.string(from: date).lowercased()
+    }
+
     private var todayLogs: [WaterLogEntry] {
-        Array(store.drinkingEventsToday().reversed().prefix(5))
+        Array(store.drinkingEventsToday().prefix(5))
     }
 
     var body: some View {
@@ -23,9 +33,10 @@ struct WaterLogListView: View {
                 VStack(spacing: 2) {
                     ForEach(todayLogs) { log in
                         HStack(spacing: 4) {
-                            Text(log.date.formatted(date: .omitted, time: .shortened))
+                            Text(formattedTime(log.date))
                                 .font(.system(size: 9))
                                 .foregroundStyle(Color(white: 0.5))
+                                .padding(.trailing, 2)
                             Text("\(log.amountMl)ml")
                                 .font(.system(size: 10, weight: .semibold, design: .rounded))
                                 .foregroundStyle(Color(red: 0.247, green: 0.663, blue: 0.988))
@@ -39,8 +50,8 @@ struct WaterLogListView: View {
                 }
             }
         }
-        .frame(width: 92)
         .background(Color(white: 0.08))
         .cornerRadius(8)
+        .onReceive(store.$waterLogs) { _ in }
     }
 }
