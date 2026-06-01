@@ -32,13 +32,13 @@ struct WaterTrackerView: View {
                 Image(systemName: "person.fill")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                    .frame(width: 80, height: 80)
+                    .frame(width: 60, height: 60)
                     .foregroundStyle(.blue.opacity(0.05))
-                    .offset(y: 5)
+                    .offset(y: 4)
                 
                 Circle()
-                    .stroke(Color.white.opacity(0.1), lineWidth: 8)
-                    .frame(width: 140, height: 140)
+                    .stroke(Color.white.opacity(0.1), lineWidth: 6)
+                    .frame(width: 100, height: 100)
                 
                 Circle()
                     .trim(from: 0, to: fillPercentage)
@@ -48,60 +48,62 @@ struct WaterTrackerView: View {
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         ),
-                        style: StrokeStyle(lineWidth: 8, lineCap: .round)
+                        style: StrokeStyle(lineWidth: 6, lineCap: .round)
                     )
-                    .frame(width: 140, height: 140)
+                    .frame(width: 100, height: 100)
                     .rotationEffect(.degrees(-90))
                     .animation(.spring(response: 0.6, dampingFraction: 0.8), value: fillPercentage)
                 
-                VStack(spacing: 2) {
+                VStack(spacing: 1) {
                     HStack(alignment: .firstTextBaseline, spacing: 0) {
                         Text("\(waterConsumed)")
-                            .font(.system(size: 24, weight: .bold, design: .rounded))
+                            .font(.system(size: 18, weight: .bold, design: .rounded))
                             .foregroundStyle(.cyan)
                         Text("/\(max(1, waterGoal))ml")
-                            .font(.system(size: 16, weight: .medium, design: .rounded))
+                            .font(.system(size: 13, weight: .medium, design: .rounded))
                             .foregroundStyle(.white.opacity(0.8))
                     }
                 }
                 
                 HStack {
                     Image(systemName: "heart.break.fill")
+                        .font(.system(size: 10))
                         .foregroundStyle(.gray.opacity(0.5))
-                        .offset(x: -70)
+                        .offset(x: -50)
                     Spacer()
                     Image(systemName: "drop.fill")
+                        .font(.system(size: 10))
                         .foregroundStyle(.blue)
-                        .offset(x: 70)
+                        .offset(x: 50)
                 }
-                .frame(width: 140)
+                .frame(width: 100)
 
                 // Increment Button
                 VStack {
                     Spacer()
                     Button(action: incrementWater) {
-                        VStack(spacing: 4) {
+                        VStack(spacing: 3) {
                             ZStack {
                                 Circle()
                                     .fill(Color.blue.opacity(0.15))
-                                    .frame(width: 50, height: 50)
+                                    .frame(width: 40, height: 40)
                                 
                                 Image(systemName: currentCup.shape.icon)
-                                    .font(.system(size: 20))
+                                    .font(.system(size: 16))
                                     .foregroundStyle(.blue)
                                 
                                 Image(systemName: "plus")
-                                    .font(.system(size: 10, weight: .bold))
+                                    .font(.system(size: 8, weight: .bold))
                                     .foregroundStyle(.white)
                             }
                             
                             Text("\(currentCup.amount) ml")
-                                .font(.system(size: 10, weight: .semibold))
+                                .font(.system(size: 9, weight: .semibold))
                                 .foregroundStyle(.white.opacity(0.7))
                         }
                     }
                     .buttonStyle(PlainButtonStyle())
-                    .offset(y: 45)
+                    .offset(y: 12)
                 }
                 
                 // Cup Switcher (Popover)
@@ -115,16 +117,16 @@ struct WaterTrackerView: View {
                             ZStack {
                                 Circle()
                                     .fill(Color.white.opacity(0.1))
-                                    .frame(width: 32, height: 32)
+                                    .frame(width: 26, height: 26)
                                 
                                 Image(systemName: "arrow.2.circlepath")
-                                    .font(.system(size: 14))
+                                    .font(.system(size: 11))
                                     .foregroundStyle(.white.opacity(0.6))
                             }
                         }
                         .buttonStyle(PlainButtonStyle())
-                        .frame(width: 32, height: 32)
-                        .offset(x: 60, y: 30)
+                        .frame(width: 26, height: 26)
+                        .offset(x: 36, y: 8)
                         .popover(isPresented: $showCupPicker) {
                             CupPickerView(
                                 selectedCupIndex: $selectedCupIndex,
@@ -134,7 +136,7 @@ struct WaterTrackerView: View {
                     }
                 }
             }
-            .frame(width: 180, height: 180)
+            .frame(width: 120, height: 120)
         }
         .frame(maxWidth: .infinity)
         .onAppear {
