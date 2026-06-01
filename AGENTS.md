@@ -104,7 +104,24 @@ boringNotch/
 - **After every change, the user MUST build** to verify. Do not batch multiple fixes before asking for a build — errors compound and become harder to trace.
 - **Never trust "ran successfully" from a script as proof the script did what was intended.** Verify the output matches expectations (e.g., check `grep` for the expected entries in `project.pbxproj` after running the linker script).
 
-### 5. SELECTOR SAFETY IN APPKIT
+### 5. VIEWBUILDER RULES (SWIFTUI)
+- `ViewBuilder` closures (in `body`, `.overlay`, `.background`, etc.) only accept:
+  - `View`-conforming expressions (e.g., `Text(...)`, `Image(...)`, `Color(...)`)
+  - `let` bindings of View types
+  - Control flow (`if`, `switch`, `ForEach`)
+- You CANNOT place arbitrary statements inside a `ViewBuilder` block:
+  - Mutating objects: `formatter.dateFormat = ...` ❌
+  - Calling void-returning functions: `someFunction()` ❌
+  - Creating non-View objects that aren't captured by a `let` bound to a `View`:
+    - `let formatter = DateFormatter()` ❌ (DateFormatter is not a View)
+- **Fix:** Move logic into a computed property, helper function, or use SwiftUI's built-in formatters (e.g., `date.formatted(date:time:)` instead of `DateFormatter`).
+
+### 6. KNOW YOUR DATA TYPES BEFORE COMPARISON
+- Before using `proxy.value(atX: as: SomeType.self)` in a `.chartOverlay`, verify the actual type of the axis data. A chart's x-axis may use `String` for some data and `Int` for others depending on the backing struct.
+- Never assume `.day` is a `String` — check whether the struct stores `day: String` (day name) or `day: Int` (day-of-month number).
+- Rule: **Read the surrounding `BarMark(x: .value("Day", item.day))` usage** — if the stat lines later use `item.day` in string interpolation without formatting, the type might not be what you assume. Cross-check with the data store method signature.
+
+### 7. SELECTOR SAFETY IN APPKIT
 - `#selector(...)` requires the method to exist on the class or its superclass, and the method must be marked `@objc`. Before using `#selector(foo)`, verify:
   1. The method `foo` is defined in this class (or superclass), not in a different class.
   2. The method is exposed with `@objc` (e.g., `@objc private func foo()`).

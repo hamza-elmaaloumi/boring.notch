@@ -118,9 +118,7 @@ struct WaterDashboardView: View {
                 }
                 .overlay(alignment: .top) {
                     if let h = hoveredLog {
-                        let formatter = DateFormatter()
-                        formatter.dateFormat = "h:mm a"
-                        Text("\(formatter.string(from: h.time)) · \(displayMl(h.amount)) \(unitLabel())")
+                        Text("\(h.time.formatted(date: .omitted, time: .shortened)) · \(displayMl(h.amount)) \(unitLabel())")
                             .font(.caption)
                             .padding(.horizontal, 8)
                             .padding(.vertical, 4)
@@ -240,9 +238,9 @@ struct WaterDashboardView: View {
                                     let plotFrame = proxy.plotFrame!
                                     let origin = geometry[plotFrame].origin
                                     let xPos = location.x - origin.x
-                                    let day: String? = proxy.value(atX: xPos, as: String.self)
+                                    let day: Int? = proxy.value(atX: xPos, as: Int.self)
                                     if let day, let match = data.first(where: { $0.day == day }) {
-                                        hoveredDay = (day: match.day, ml: match.ml)
+                                        hoveredDay = (day: "\(match.day)", ml: match.ml)
                                     }
                                 case .ended:
                                     hoveredDay = nil

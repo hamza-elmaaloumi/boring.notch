@@ -74,9 +74,7 @@ struct PomodoroDashboardView: View {
                     }
                     .overlay(alignment: .top) {
                         if let session = hoveredSession {
-                            let formatter = DateFormatter()
-                            formatter.dateFormat = "h:mm a"
-                            Text("\(formatter.string(from: session.startDate)) · \(session.durationSeconds / 60)m\(session.completed ? "" : " (interrupted)")")
+                            Text("\(session.startDate.formatted(date: .omitted, time: .shortened)) · \(session.durationSeconds / 60)m\(session.completed ? "" : " (interrupted)")")
                                 .font(.caption)
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 4)
@@ -210,9 +208,9 @@ struct PomodoroDashboardView: View {
                                     let plotFrame = proxy.plotFrame!
                                     let origin = geometry[plotFrame].origin
                                     let xPos = location.x - origin.x
-                                    let day: String? = proxy.value(atX: xPos, as: String.self)
+                                    let day: Int? = proxy.value(atX: xPos, as: Int.self)
                                     if let day, let match = data.first(where: { $0.day == day }) {
-                                        hoveredDay = (day: match.day, minutes: match.minutes)
+                                        hoveredDay = (day: "\(match.day)", minutes: match.minutes)
                                     }
                                 case .ended:
                                     hoveredDay = nil
