@@ -48,6 +48,43 @@ struct WaterGlassIcon: View {
     }
 }
 
+struct TaperedGlassShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        Path { path in
+            let topWidth = rect.width
+            let bottomWidth = rect.width * 0.72
+            let cornerRadius: CGFloat = min(6, bottomWidth * 0.15)
+
+            let topLeftX = (rect.width - topWidth) / 2
+            let topRightX = (rect.width + topWidth) / 2
+            let bottomLeftX = (rect.width - bottomWidth) / 2
+            let bottomRightX = (rect.width + bottomWidth) / 2
+            let y = rect.height
+
+            path.move(to: CGPoint(x: topLeftX, y: 0))
+            path.addLine(to: CGPoint(x: topRightX, y: 0))
+            path.addLine(to: CGPoint(x: bottomRightX - cornerRadius, y: y))
+            path.addArc(
+                center: CGPoint(x: bottomRightX - cornerRadius, y: y - cornerRadius),
+                radius: cornerRadius,
+                startAngle: .degrees(0),
+                endAngle: .degrees(90),
+                clockwise: false
+            )
+            path.addLine(to: CGPoint(x: bottomLeftX + cornerRadius, y: y))
+            path.addArc(
+                center: CGPoint(x: bottomLeftX + cornerRadius, y: y - cornerRadius),
+                radius: cornerRadius,
+                startAngle: .degrees(90),
+                endAngle: .degrees(180),
+                clockwise: false
+            )
+            path.addLine(to: CGPoint(x: topLeftX, y: 0))
+            path.closeSubpath()
+        }
+    }
+}
+
 struct WaterTrackerView: View {
     @AppStorage("waterConsumed") private var waterConsumed: Int = 0
     @AppStorage("waterGoal") private var waterGoal: Int = 2000
@@ -192,19 +229,28 @@ struct WaterTrackerView: View {
     // MARK: - Water Wave
 
     private var waterWave: some View {
-        WaterWave()
-            .fill(Color(red: 0.2, green: 0.35, blue: 0.55))
-            .frame(width: innerDiameter, height: innerDiameter)
-            .clipShape(Circle())
+        Button(action: incrementWater) {
+            WaterWave()
+                .fill(Color(red: 0.2, green: 0.35, blue: 0.55))
+                .frame(width: innerDiameter, height: innerDiameter)
+                .clipShape(Circle())
+        }
+        .buttonStyle(PlainButtonStyle())
     }
 
     // MARK: - Quick Add Button
 
     private var quickAddButton: some View {
         VStack(spacing: 3) {
-            Button(action: incrementWater) {
-                WaterGlassIcon(filled: true, iconName: currentCup.shape.icon)
-            }
+            WaterGlassIcon(filled: true, iconName: currentCup.shape.icon)
+
+            Text("\(currentCup.amount) ml")
+                .font(.system(size: 11, weight: .bold, design: .rounded))
+                .foregroundStyle(Color(red: 0.247, green: 0.663, blue: 0.988))
+        }
+        .offset(x: -6, y: innerDiameter * 0.2)
+        .allowsHitTesting(false)
+    }
             .buttonStyle(PlainButtonStyle())
 
             Text("\(currentCup.amount) ml")
@@ -226,9 +272,9 @@ struct WaterTrackerView: View {
                     .frame(width: 40, height: 40)
                     .shadow(color: .white.opacity(0.08), radius: 4, x: 0, y: 2)
 
-                Image(systemName: "cup.and.saucer.fill")
-                    .font(.system(size: 16))
-                    .foregroundStyle(.blue)
+                TaperedGlassShape()
+                    .fill(.blue)
+                    .frame(width: 16, height: 20)
 
                 ZStack {
                     Circle()
@@ -267,7 +313,7 @@ struct WaterTrackerView: View {
     }
 
     private func incrementWater() {
-        NSSound(named: "Pop")?.play()
+        AudioPlayer().play(fileName: "water_stream", fileExtension: "caf")
 
         let increment = currentCup.amount
         withAnimation(.spring(response: 0.42, dampingFraction: 0.82)) {

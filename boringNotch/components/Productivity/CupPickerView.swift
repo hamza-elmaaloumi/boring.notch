@@ -59,9 +59,9 @@ struct CupPickerView: View {
 
     private var customCupCell: some View {
         HStack(spacing: 12) {
-            Image(systemName: WaterCupShape.cup.icon)
-                .font(.system(size: 28))
-                .foregroundStyle(selectedCupIndex == 6 ? .blue : .white)
+            TaperedGlassShape()
+                .fill(selectedCupIndex == 6 ? .blue : .white)
+                .frame(width: 28, height: 34)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text("Custom")
