@@ -251,14 +251,6 @@ struct WaterTrackerView: View {
         .offset(x: -6, y: innerDiameter * 0.2)
         .allowsHitTesting(false)
     }
-            .buttonStyle(PlainButtonStyle())
-
-            Text("\(currentCup.amount) ml")
-                .font(.system(size: 11, weight: .bold, design: .rounded))
-                .foregroundStyle(Color(red: 0.247, green: 0.663, blue: 0.988))
-        }
-        .offset(x: -6, y: innerDiameter * 0.2)
-    }
 
     // MARK: - Auxiliary Button
 
