@@ -34,6 +34,15 @@ final class PomodoroTimerStore: ObservableObject {
     var currentSessionId: UUID?
     var sessionStartDate: Date?
 
+    var elapsedFocusedSeconds: Int {
+        guard currentMode == .focus, let start = sessionStartDate else { return 0 }
+        return Int(Date().timeIntervalSince(start))
+    }
+
+    var showsTimeInNotch: Bool {
+        currentMode == .focus && timeRemaining > 0 && !hasCompleted
+    }
+
     private init() {
         NotificationCenter.default.addObserver(
             forName: NSApplication.willTerminateNotification,
@@ -144,6 +153,21 @@ final class PomodoroTimerStore: ObservableObject {
 
     private func pauseTimer() {
         updateRemainingTime()
+
+        if currentMode == .focus, let start = sessionStartDate {
+            let actualDuration = Int(Date().timeIntervalSince(start))
+            if actualDuration > 0 {
+                let session = FocusSession(
+                    startDate: start,
+                    endDate: Date(),
+                    durationSeconds: actualDuration,
+                    mode: currentMode.rawValue,
+                    completed: false
+                )
+                ProductivityDataStore.shared.saveFocusSession(session)
+            }
+        }
+
         timer?.invalidate()
         timer = nil
         isRunning = false
@@ -226,7 +250,9 @@ struct PomodoroTimerView: View {
     }
 
     private var todaySummaryText: some View {
-        let total = ProductivityDataStore.shared.totalFocusTimeToday()
+        let saved = ProductivityDataStore.shared.totalFocusTimeToday()
+        let live = timerStore.elapsedFocusedSeconds
+        let total = saved + live
         let hours = total / 3600
         let minutes = (total % 3600) / 60
         let accent = Color.red

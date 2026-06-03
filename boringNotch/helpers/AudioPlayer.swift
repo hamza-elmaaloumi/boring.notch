@@ -9,7 +9,19 @@ import Foundation
 import AppKit
 
 class AudioPlayer {
-    func play(fileName: String, fileExtension: String) {
-        NSSound(contentsOf:Bundle.main.url(forResource: fileName, withExtension: fileExtension)!, byReference: false)?.play()
+    func play(fileName: String, fileExtension: String, duration: TimeInterval? = nil) {
+        guard let url = Bundle.main.url(forResource: fileName, withExtension: fileExtension),
+              let sound = NSSound(contentsOf: url, byReference: false) else { return }
+
+        if let duration = duration {
+            sound.play()
+            DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
+                if sound.isPlaying {
+                    sound.stop()
+                }
+            }
+        } else {
+            sound.play()
+        }
     }
 }

@@ -89,11 +89,11 @@ class DrinkingReminderManager: ObservableObject {
         let allowDuringFocus = UserDefaults.standard.bool(forKey: "allowRemindersDuringFocus")
         
         if isDuringFocus && !allowDuringFocus {
-            AudioPlayer().play(fileName: "water_stream", fileExtension: "caf")
+            AudioPlayer().play(fileName: "water_stream", fileExtension: "caf", duration: 1)
             return
         }
         
-        AudioPlayer().play(fileName: "water_stream", fileExtension: "caf")
+        AudioPlayer().play(fileName: "water_stream", fileExtension: "caf", duration: 1)
         NotificationCenter.default.post(name: .drinkingReminderDidFire, object: nil)
     }
     

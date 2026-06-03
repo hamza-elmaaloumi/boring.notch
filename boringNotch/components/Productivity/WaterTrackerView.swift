@@ -1,5 +1,6 @@
 import SwiftUI
 import Defaults
+import AppKit
 
 struct WaterWave: Shape {
     var peakHeight: CGFloat = 32
@@ -266,6 +267,8 @@ struct WaterTrackerView: View {
     }
 
     private func incrementWater() {
+        NSSound(named: "Pop")?.play()
+
         let increment = currentCup.amount
         withAnimation(.spring(response: 0.42, dampingFraction: 0.82)) {
             waterConsumed += increment

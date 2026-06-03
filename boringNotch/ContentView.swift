@@ -76,8 +76,9 @@ struct ContentView: View {
         {
             chinWidth += (2 * max(0, vm.effectiveClosedNotchHeight - 12) + 20)
         } else if !coordinator.expandingView.show && vm.notchState == .closed
-            && (!musicManager.isPlaying && musicManager.isPlayerIdle) && Defaults[.showNotHumanFace]
-            && !vm.hideOnClosed
+            && (!musicManager.isPlaying && musicManager.isPlayerIdle)
+            && (Defaults[.showNotHumanFace] || (Defaults[.showPomodoroTimerInNotch] && pomodoroTimerStore.showsTimeInNotch))
+            && (!vm.hideOnClosed || (Defaults[.showPomodoroTimerInNotch] && pomodoroTimerStore.showsTimeInNotch))
         {
             chinWidth += (2 * max(0, vm.effectiveClosedNotchHeight - 12) + 20)
         }
@@ -318,9 +319,10 @@ struct ContentView: View {
                       } else if (!coordinator.expandingView.show || coordinator.expandingView.type == .music) && vm.notchState == .closed && (musicManager.isPlaying || !musicManager.isPlayerIdle) && coordinator.musicLiveActivityEnabled && !vm.hideOnClosed {
                           MusicLiveActivity()
                               .frame(alignment: .center)
-                                            } else if !coordinator.expandingView.show && vm.notchState == .closed && (!musicManager.isPlaying && musicManager.isPlayerIdle) && !vm.hideOnClosed {
+                                            } else if !coordinator.expandingView.show && vm.notchState == .closed && (!musicManager.isPlaying && musicManager.isPlayerIdle) && (!vm.hideOnClosed || (Defaults[.showPomodoroTimerInNotch] && pomodoroTimerStore.showsTimeInNotch)) {
                                                     BoringFaceAnimation(
-                                                        timerText: pomodoroTimerStore.isRunning ? timeRemainingText : nil,
+                                                        timerText: (Defaults[.showPomodoroTimerInNotch] && pomodoroTimerStore.showsTimeInNotch) ? timeRemainingText : nil,
+                                                        showFace: Defaults[.showNotHumanFace],
                                                         timerColor: pomodoroTimerColor
                                                     )
                        } else if vm.notchState == .open {
@@ -402,9 +404,9 @@ struct ContentView: View {
     }
 
     @ViewBuilder
-    func BoringFaceAnimation(timerText: String? = nil, timerColor: Color = .white) -> some View {
+    func BoringFaceAnimation(timerText: String? = nil, showFace: Bool = true, timerColor: Color = .white) -> some View {
         let timerSlotWidth: CGFloat = 72
-        let faceSlotSize = max(0, vm.effectiveClosedNotchHeight - 12)
+        let faceSlotSize = max(0, vm.effectiveClosedNotchHeight == 0 && pomodoroTimerStore.showsTimeInNotch ? 24 : vm.effectiveClosedNotchHeight - 12)
 
         HStack(spacing: 0) {
             if let timerText {
@@ -425,17 +427,19 @@ struct ContentView: View {
                 .fill(.black)
                 .frame(width: vm.closedNotchSize.width - 20)
 
-            ZStack {
-                Rectangle()
-                    .fill(.clear)
+            if showFace {
+                ZStack {
+                    Rectangle()
+                        .fill(.clear)
 
-                MinimalFaceFeatures()
-                    .offset(x: 5)
+                    MinimalFaceFeatures()
+                        .offset(x: 5)
+                }
+                .frame(width: faceSlotSize + 10, height: faceSlotSize)
+                .padding(.trailing, 6)
             }
-            .frame(width: faceSlotSize + 10, height: faceSlotSize)
-            .padding(.trailing, 6)
         }.frame(
-            height: vm.effectiveClosedNotchHeight,
+            height: max(vm.effectiveClosedNotchHeight, pomodoroTimerStore.showsTimeInNotch ? 30 : 0),
             alignment: .center
         )
     }

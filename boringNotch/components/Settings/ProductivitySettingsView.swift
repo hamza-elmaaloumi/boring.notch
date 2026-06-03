@@ -163,6 +163,18 @@ struct ProductivitySettingsContent: View {
                     .padding()
                 }
 
+                GroupBox(label: Text("Notch Display").font(.headline)) {
+                    VStack(spacing: 15) {
+                        Defaults.Toggle(key: .showPomodoroTimerInNotch) {
+                            Text("Show timer in notch when active")
+                        }
+                        Defaults.Toggle(key: .showNotHumanFace) {
+                            Text("Show face animation in notch")
+                        }
+                    }
+                    .padding()
+                }
+
                 Spacer()
             }
             .padding(30)
