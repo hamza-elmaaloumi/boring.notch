@@ -85,6 +85,57 @@ struct TaperedGlassShape: Shape {
     }
 }
 
+struct TaperedGlassIcon: View {
+    var fillPercentage: CGFloat = 0.55
+
+    private var topLeftX: CGFloat { 0 }
+    private var topRightX: CGFloat { 1 }
+    private var bottomLeftX: CGFloat { 0.14 }
+    private var bottomRightX: CGFloat { 0.86 }
+
+    var body: some View {
+        TaperedGlassShape()
+            .stroke(.blue, lineWidth: 2)
+            .background(
+                waterFill
+                    .mask(TaperedGlassShape().scale(0.92).offset(y: 1))
+            )
+    }
+
+    private var waterFill: some View {
+        GeometryReader { geo in
+            let w = geo.size.width
+            let h = geo.size.height
+            let waterTop = h * (1 - fillPercentage)
+            let waveAmplitude: CGFloat = h * 0.04
+            let waveFreq: CGFloat = 2.5
+
+            Path { path in
+                path.move(to: CGPoint(x: w * bottomLeftX + 1, y: h - 2))
+
+                path.addArc(
+                    center: CGPoint(x: w * bottomRightX - 5, y: h - 5),
+                    radius: 3,
+                    startAngle: .degrees(90),
+                    endAngle: .degrees(0),
+                    clockwise: true
+                )
+
+                path.addLine(to: CGPoint(x: w * topRightX - 2, y: waterTop + waveAmplitude))
+
+                for x in stride(from: w * topRightX - 2, through: w * topLeftX + 2, by: -1) {
+                    let progress = (x - w * topLeftX) / w
+                    let y = waterTop + waveAmplitude * sin(progress * waveFreq * .pi * 2)
+                    path.addLine(to: CGPoint(x: x, y: y))
+                }
+
+                path.closeSubpath()
+            }
+            .fill(Color(red: 0.28, green: 0.56, blue: 0.86))
+        }
+    }
+}
+
 struct WaterTrackerView: View {
     @AppStorage("waterConsumed") private var waterConsumed: Int = 0
     @AppStorage("waterGoal") private var waterGoal: Int = 2000
@@ -264,8 +315,7 @@ struct WaterTrackerView: View {
                     .frame(width: 40, height: 40)
                     .shadow(color: .white.opacity(0.08), radius: 4, x: 0, y: 2)
 
-                TaperedGlassShape()
-                    .fill(.blue)
+                TaperedGlassIcon(fillPercentage: 0.55)
                     .frame(width: 16, height: 20)
 
                 ZStack {
@@ -305,7 +355,7 @@ struct WaterTrackerView: View {
     }
 
     private func incrementWater() {
-        AudioPlayer().play(fileName: "water_stream", fileExtension: "caf")
+        AudioPlayer().play(fileName: "water_stream", fileExtension: "caf", duration: 1)
 
         let increment = currentCup.amount
         withAnimation(.spring(response: 0.42, dampingFraction: 0.82)) {

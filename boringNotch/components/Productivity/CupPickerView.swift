@@ -59,8 +59,7 @@ struct CupPickerView: View {
 
     private var customCupCell: some View {
         HStack(spacing: 12) {
-            TaperedGlassShape()
-                .fill(selectedCupIndex == 6 ? .blue : .white)
+            TaperedGlassIcon(fillPercentage: 0.55)
                 .frame(width: 28, height: 34)
 
             VStack(alignment: .leading, spacing: 2) {
