@@ -169,12 +169,20 @@ struct WaterTrackerView: View {
     private let arcSpan: CGFloat = 0.611
     private let arcRotation: CGFloat = 160
 
+    private let innerArcDiameter: CGFloat = 184
+    private let innerArcSpan: CGFloat = 0.278
+    private let innerArcRotation: CGFloat = 40
+
     private var center: CGPoint {
         CGPoint(x: containerSize / 2, y: containerSize / 2)
     }
 
     private var arcRadius: CGFloat {
         arcDiameter / 2
+    }
+
+    private var innerArcRadius: CGFloat {
+        innerArcDiameter / 2
     }
 
     private var arcStartAngle: CGFloat {
@@ -185,10 +193,16 @@ struct WaterTrackerView: View {
         arcRotation + arcSpan * 360
     }
 
+    private var activeHoursProgress: CGFloat {
+        ProductivityDataStore.shared.activeDayProgress
+    }
+
     var body: some View {
         ZStack {
             arcTrack
             arcProgress
+            innerArcTrack
+            innerArcProgress
             innerCard
             endpointIcons
             centerText
@@ -226,6 +240,23 @@ struct WaterTrackerView: View {
             .rotationEffect(.degrees(arcRotation))
             .frame(width: arcDiameter, height: arcDiameter)
             .animation(.spring(response: 0.6, dampingFraction: 0.8), value: fillPercentage)
+    }
+
+    private var innerArcTrack: some View {
+        Circle()
+            .trim(from: 0, to: innerArcSpan)
+            .stroke(Color.orange.opacity(0.12), style: StrokeStyle(lineWidth: 3, lineCap: .round))
+            .rotationEffect(.degrees(innerArcRotation))
+            .frame(width: innerArcDiameter, height: innerArcDiameter)
+    }
+
+    private var innerArcProgress: some View {
+        Circle()
+            .trim(from: 0, to: innerArcSpan * min(activeHoursProgress, 1))
+            .stroke(Color.orange, style: StrokeStyle(lineWidth: 4, lineCap: .round))
+            .rotationEffect(.degrees(innerArcRotation))
+            .frame(width: innerArcDiameter, height: innerArcDiameter)
+            .animation(.spring(response: 0.6, dampingFraction: 0.8), value: activeHoursProgress)
     }
 
     // MARK: - Inner Card

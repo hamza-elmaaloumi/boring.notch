@@ -312,4 +312,38 @@ extension ProductivityDataStore {
         
         return result
     }
+
+    var activeDayProgress: CGFloat {
+        let startHour = UserDefaults.standard.integer(forKey: "reminderQuietHoursStart")
+        let endHour = UserDefaults.standard.integer(forKey: "reminderQuietHoursEnd")
+
+        let now = Date()
+        let calendar = Calendar.current
+        let currentHour = calendar.component(.hour, from: now)
+        let currentMinute = calendar.component(.minute, from: now)
+        let currentMinutes = currentHour * 60 + currentMinute
+
+        let startMinutes = startHour * 60
+        let endMinutes = endHour == 0 ? 24 * 60 : endHour * 60
+
+        let totalDuration: Int
+        let elapsed: Int
+
+        if startHour <= endHour {
+            totalDuration = endMinutes - startMinutes
+            elapsed = min(max(currentMinutes - startMinutes, 0), totalDuration)
+        } else {
+            totalDuration = (24 * 60 - startMinutes) + endMinutes
+            if currentMinutes >= startMinutes {
+                elapsed = currentMinutes - startMinutes
+            } else if currentMinutes <= endMinutes {
+                elapsed = (24 * 60 - startMinutes) + currentMinutes
+            } else {
+                elapsed = totalDuration
+            }
+        }
+
+        guard totalDuration > 0 else { return 0 }
+        return min(max(CGFloat(elapsed) / CGFloat(totalDuration), 0), 1)
+    }
 }
