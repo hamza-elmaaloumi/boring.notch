@@ -110,7 +110,6 @@
 		9A987A102C73CA8D005CA465 /* Collections in Frameworks */ = {isa = PBXBuildFile; productRef = 9A987A0F2C73CA8D005CA465 /* Collections */; };
 		9DF41D57B1FBCE148B10D22E /* Bookmark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70398CCC5B3480DC5CF0740D /* Bookmark.swift */; };
 		A00C65E1894331ADBD66E900 /* YouTubeMusicAuthentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1525806114BB65726908E7FE /* YouTubeMusicAuthentication.swift */; };
-		A09AD4071FE6DA56B36E9C1C /* NotchTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1FA5FAF3C2DB7D65FD0C802 /* NotchTextView.swift */; };
 		A1EB875E78D2721D973962FF /* HoverButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABED679CF2A216F2D57A3CD6 /* HoverButton.swift */; };
 		A33A4FEDE55F6133179C7568 /* PermissionsRequestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DBFBC01A9404D8C81854E65 /* PermissionsRequestView.swift */; };
 		A54E40AB724E1077ADAA5CDB /* TipStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13C979DA5E77F62923851B91 /* TipStore.swift */; };
@@ -316,7 +315,6 @@
 		AE78F40555637FF240D4E4DA /* IdeasNoteView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = IdeasNoteView.swift; path = boringNotch/components/Productivity/IdeasNoteView.swift; sourceTree = "<group>"; };
 		B13B078190773D3DB16EB316 /* CalendarModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CalendarModel.swift; path = boringNotch/models/CalendarModel.swift; sourceTree = "<group>"; };
 		B17266E02C6532560031BA0D /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
-		B1FA5FAF3C2DB7D65FD0C802 /* NotchTextView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NotchTextView.swift; path = boringNotch/components/Productivity/NotchTextView.swift; sourceTree = "<group>"; };
 		B2F7FB9D2B7F32FEB38B6B6C /* MusicControlButton.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MusicControlButton.swift; path = boringNotch/models/MusicControlButton.swift; sourceTree = "<group>"; };
 		B424C2678FFF86114B67DDF9 /* BoringNotchWindow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BoringNotchWindow.swift; path = boringNotch/components/Notch/BoringNotchWindow.swift; sourceTree = "<group>"; };
 		B5F0FD773A34D6C97F68256D /* ShelfPersistenceService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ShelfPersistenceService.swift; path = boringNotch/components/Shelf/Services/ShelfPersistenceService.swift; sourceTree = "<group>"; };
@@ -566,7 +564,6 @@
 				11F748502EC9AABA00F841DB /* BoringNotchXPCHelper */,
 				14CEF4132C5CAED300855D72 /* Products */,
 				14D031EC2C689DB70096E6A1 /* Frameworks */,
-				B1FA5FAF3C2DB7D65FD0C802 /* NotchTextView.swift */,
 				D24F1AAFD2ADE3D15E9BC51E /* BoringViewCoordinator.swift */,
 				A41047508ED7536190A773E6 /* ContentView.swift */,
 				D42B33DFE08197F94B6D3225 /* AppleMusicController.swift */,
@@ -1014,7 +1011,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A09AD4071FE6DA56B36E9C1C /* NotchTextView.swift in Sources */,
 				0FEDA34430AC77B7AF992738 /* BoringViewCoordinator.swift in Sources */,
 				C0C183E3EE8CFDBD478D2DEA /* ContentView.swift in Sources */,
 				50BDD66176FDB2C605A83348 /* AppleMusicController.swift in Sources */,
