@@ -36,11 +36,6 @@ enum HideNotchOption: String, Defaults.Serializable {
     case never
 }
 
-// Define notification names at file scope
-extension Notification.Name {
-    static let mediaControllerChanged = Notification.Name("mediaControllerChanged")
-}
-
 // Media controller types for selection in settings
 enum MediaControllerType: String, CaseIterable, Identifiable, Defaults.Serializable {
     case nowPlaying = "Now Playing"
@@ -229,6 +224,10 @@ extension Defaults.Keys {
     
     // MARK: Productivity
     static let autoCalculateWaterGoal = Key<Bool>("autoCalculateWaterGoal", default: true)
+    static let waterGoal = Key<Int>("waterGoal", default: 2000)
+    static let allowRemindersDuringFocus = Key<Bool>("allowRemindersDuringFocus", default: false)
+    static let reminderQuietHoursStart = Key<Int>("reminderQuietHoursStart", default: 9)
+    static let reminderQuietHoursEnd = Key<Int>("reminderQuietHoursEnd", default: 22)
     static let selectedCupIndex = Key<Int>("selectedCupIndex", default: 1) // Default to Medium Cup
     static let customCupAmount = Key<Int>("customCupAmount", default: 250)
     static let ideasNote = Key<String>("ideasNote", default: "")

@@ -1,5 +1,6 @@
 import AppKit
 import Combine
+import Defaults
 import Foundation
 
 @MainActor
@@ -69,14 +70,14 @@ class DrinkingReminderManager: ObservableObject {
         guard isEnabled else { return }
         
         let dataStore = ProductivityDataStore.shared
-        let dailyGoal = UserDefaults.standard.integer(forKey: "waterGoal")
+        let dailyGoal = Defaults[.waterGoal]
         
         if dataStore.waterConsumedToday() >= dailyGoal {
             return
         }
         
-        let quietStart = UserDefaults.standard.integer(forKey: "reminderQuietHoursStart")
-        let quietEnd = UserDefaults.standard.integer(forKey: "reminderQuietHoursEnd")
+        let quietStart = Defaults[.reminderQuietHoursStart]
+        let quietEnd = Defaults[.reminderQuietHoursEnd]
         let currentHour = Calendar.current.component(.hour, from: Date())
         
         if quietStart < quietEnd {
@@ -86,7 +87,7 @@ class DrinkingReminderManager: ObservableObject {
         }
         
         let isDuringFocus = PomodoroTimerStore.shared.isRunning && PomodoroTimerStore.shared.currentMode == .focus
-        let allowDuringFocus = UserDefaults.standard.bool(forKey: "allowRemindersDuringFocus")
+        let allowDuringFocus = Defaults[.allowRemindersDuringFocus]
         
         if isDuringFocus && !allowDuringFocus {
             AudioPlayer().play(fileName: "water_stream", fileExtension: "caf", duration: 1)

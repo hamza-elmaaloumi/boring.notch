@@ -243,8 +243,4 @@ final class XPCHelperClient: NSObject {
     }
 }
 
-extension Notification.Name {
-    static let accessibilityAuthorizationChanged = Notification.Name("accessibilityAuthorizationChanged")
-}
-
 

@@ -31,10 +31,10 @@ struct ProductivitySettingsContent: View {
     @AppStorage("pomodoroShortBreak") private var pomodoroShortBreak: Int = 5
     @AppStorage("pomodoroLongBreak") private var pomodoroLongBreak: Int = 15
 
-    @AppStorage("waterGoal") private var waterGoal: Int = 2000
+    @Default(.waterGoal) var waterGoal
     @AppStorage("dailyFocusGoalMinutes") private var dailyFocusGoal: Int = 120
     @AppStorage("drinkingReminderInterval") private var reminderInterval: Int = 96
-    @AppStorage("allowRemindersDuringFocus") private var allowDuringFocus: Bool = false
+    @Default(.allowRemindersDuringFocus) var allowDuringFocus
 
     @Default(.userHeight) var userHeight
     @Default(.userWeight) var userWeight

@@ -1,8 +1,9 @@
+import Defaults
 import SwiftUI
 
 struct ActiveHoursSlider: View {
-    @AppStorage("reminderQuietHoursStart") private var startHour: Int = 8
-    @AppStorage("reminderQuietHoursEnd") private var endHour: Int = 0
+    @Default(.reminderQuietHoursStart) var startHour
+    @Default(.reminderQuietHoursEnd) var endHour
 
     @State private var startDisplayHour: String = ""
     @State private var startIsAM: Bool = true
@@ -126,8 +127,6 @@ struct ActiveHoursSlider: View {
             }
         }
         .onAppear {
-            UserDefaults.standard.set(startHour, forKey: "reminderQuietHoursStart")
-            UserDefaults.standard.set(endHour, forKey: "reminderQuietHoursEnd")
             syncDisplayFromSlider()
         }
         .onChange(of: startHour) { _, _ in

@@ -80,7 +80,7 @@ class ProductivityDataStore: ObservableObject {
         
         if Defaults[.autoCalculateWaterGoal] {
             let goal = calculateWaterGoal(height: Defaults[.userHeight], weight: Defaults[.userWeight])
-            UserDefaults.standard.set(goal, forKey: "waterGoal")
+            Defaults[.waterGoal] = goal
         }
     }
     
@@ -314,8 +314,8 @@ extension ProductivityDataStore {
     }
 
     var activeDayProgress: CGFloat {
-        let startHour = UserDefaults.standard.integer(forKey: "reminderQuietHoursStart")
-        let endHour = UserDefaults.standard.integer(forKey: "reminderQuietHoursEnd")
+        let startHour = Defaults[.reminderQuietHoursStart]
+        let endHour = Defaults[.reminderQuietHoursEnd]
 
         let now = Date()
         let calendar = Calendar.current
