@@ -126,3 +126,13 @@ boringNotch/
   1. The method `foo` is defined in this class (or superclass), not in a different class.
   2. The method is exposed with `@objc` (e.g., `@objc private func foo()`).
 - Dead classes (files that exist but are never instantiated or referenced) still get compiled. If they contain unresolvable selectors, they will fail the build. Audit the entire file, not just the parts you change.
+
+### 8. FEATURE REQUEST CLARIFICATION PROTOCOL
+- When the user asks to add, implement, or change a feature, you MUST reformulate the request in your own structured words before writing any code.
+- The goal is to confirm shared understanding and eliminate ambiguity before implementation begins.
+- Structure your reformulation as:
+  1. **Summary** — One-line description of what the feature does
+  2. **Behavior** — How it works from the user's perspective (inputs, outputs, interactions, UI flow)
+  3. **Scope** — What is included and what is explicitly out of scope
+  4. **Open questions** — Any ambiguities, missing details, or design choices needing clarification
+- Do NOT proceed to implementation until the user confirms your reformulation is correct.

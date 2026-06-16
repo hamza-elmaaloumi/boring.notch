@@ -231,6 +231,7 @@ extension Defaults.Keys {
     static let autoCalculateWaterGoal = Key<Bool>("autoCalculateWaterGoal", default: true)
     static let selectedCupIndex = Key<Int>("selectedCupIndex", default: 1) // Default to Medium Cup
     static let customCupAmount = Key<Int>("customCupAmount", default: 250)
+    static let ideasNote = Key<String>("ideasNote", default: "")
 
     // MARK: Calendar
     static let calendarSelectionState = Key<CalendarSelectionState>("calendarSelectionState", default: .all)

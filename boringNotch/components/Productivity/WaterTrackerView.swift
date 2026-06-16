@@ -50,36 +50,75 @@ struct WaterGlassIcon: View {
 
 struct TaperedGlassShape: Shape {
     func path(in rect: CGRect) -> Path {
-        Path { path in
-            let topWidth = rect.width
-            let bottomWidth = rect.width * 0.72
-            let cornerRadius: CGFloat = min(6, bottomWidth * 0.15)
+        let w = rect.width
+        let h = rect.height
 
-            let topLeftX = (rect.width - topWidth) / 2
-            let topRightX = (rect.width + topWidth) / 2
-            let bottomLeftX = (rect.width - bottomWidth) / 2
-            let bottomRightX = (rect.width + bottomWidth) / 2
-            let y = rect.height
+        let bottomWidth = w * 0.72
 
-            path.move(to: CGPoint(x: topLeftX, y: 0))
-            path.addLine(to: CGPoint(x: topRightX, y: 0))
-            path.addLine(to: CGPoint(x: bottomRightX - cornerRadius, y: y))
+        let topLeftX: CGFloat = 0
+        let topRightX: CGFloat = w
+        let bottomLeftX = (w - bottomWidth) / 2
+        let bottomRightX = (w + bottomWidth) / 2
+
+        let topRadius = w * 0.15
+        let bottomRadius = w * 0.10
+
+        let sideInset: CGFloat = w * 0.02
+
+        return Path { path in
+            path.move(to: CGPoint(x: topLeftX + topRadius, y: 0))
+
+            path.addLine(to: CGPoint(x: topRightX - topRadius, y: 0))
             path.addArc(
-                center: CGPoint(x: bottomRightX - cornerRadius, y: y - cornerRadius),
-                radius: cornerRadius,
+                center: CGPoint(x: topRightX - topRadius, y: topRadius),
+                radius: topRadius,
+                startAngle: .degrees(270),
+                endAngle: .degrees(0),
+                clockwise: false
+            )
+
+            path.addQuadCurve(
+                to: CGPoint(x: bottomRightX, y: h - bottomRadius),
+                control: CGPoint(
+                    x: topRightX - sideInset,
+                    y: h * 0.5
+                )
+            )
+
+            path.addArc(
+                center: CGPoint(x: bottomRightX - bottomRadius, y: h - bottomRadius),
+                radius: bottomRadius,
                 startAngle: .degrees(0),
                 endAngle: .degrees(90),
                 clockwise: false
             )
-            path.addLine(to: CGPoint(x: bottomLeftX + cornerRadius, y: y))
+
+            path.addLine(to: CGPoint(x: bottomLeftX + bottomRadius, y: h))
+
             path.addArc(
-                center: CGPoint(x: bottomLeftX + cornerRadius, y: y - cornerRadius),
-                radius: cornerRadius,
+                center: CGPoint(x: bottomLeftX + bottomRadius, y: h - bottomRadius),
+                radius: bottomRadius,
                 startAngle: .degrees(90),
                 endAngle: .degrees(180),
                 clockwise: false
             )
-            path.addLine(to: CGPoint(x: topLeftX, y: 0))
+
+            path.addQuadCurve(
+                to: CGPoint(x: topLeftX, y: topRadius),
+                control: CGPoint(
+                    x: bottomLeftX + sideInset,
+                    y: h * 0.5
+                )
+            )
+
+            path.addArc(
+                center: CGPoint(x: topLeftX + topRadius, y: topRadius),
+                radius: topRadius,
+                startAngle: .degrees(180),
+                endAngle: .degrees(270),
+                clockwise: false
+            )
+
             path.closeSubpath()
         }
     }
@@ -88,17 +127,18 @@ struct TaperedGlassShape: Shape {
 struct TaperedGlassIcon: View {
     var fillPercentage: CGFloat = 0.55
 
-    private var topLeftX: CGFloat { 0 }
-    private var topRightX: CGFloat { 1 }
-    private var bottomLeftX: CGFloat { 0.14 }
-    private var bottomRightX: CGFloat { 0.86 }
+    private let waterColor = Color(red: 0.247, green: 0.663, blue: 0.988)
 
     var body: some View {
         TaperedGlassShape()
             .stroke(.blue, lineWidth: 2)
             .background(
                 waterFill
-                    .mask(TaperedGlassShape().scale(0.92).offset(y: 1))
+                    .mask(
+                        TaperedGlassShape()
+                            .scale(0.92)
+                            .offset(y: 1)
+                    )
             )
     }
 
@@ -107,31 +147,30 @@ struct TaperedGlassIcon: View {
             let w = geo.size.width
             let h = geo.size.height
             let waterTop = h * (1 - fillPercentage)
-            let waveAmplitude: CGFloat = h * 0.04
-            let waveFreq: CGFloat = 2.5
+            let waveAmplitude: CGFloat = h * 0.06
 
             Path { path in
-                path.move(to: CGPoint(x: w * bottomLeftX + 1, y: h - 2))
+                path.move(to: CGPoint(x: 0, y: h))
 
-                path.addArc(
-                    center: CGPoint(x: w * bottomRightX - 5, y: h - 5),
-                    radius: 3,
-                    startAngle: .degrees(90),
-                    endAngle: .degrees(0),
-                    clockwise: true
+                path.addLine(to: CGPoint(x: w, y: h))
+
+                path.addLine(to: CGPoint(x: w, y: waterTop))
+
+                path.addCurve(
+                    to: CGPoint(x: w * 0.5, y: waterTop),
+                    control1: CGPoint(x: w * 0.75, y: waterTop - waveAmplitude),
+                    control2: CGPoint(x: w * 0.65, y: waterTop - waveAmplitude)
                 )
 
-                path.addLine(to: CGPoint(x: w * topRightX - 2, y: waterTop + waveAmplitude))
-
-                for x in stride(from: w * topRightX - 2, through: w * topLeftX + 2, by: -1) {
-                    let progress = (x - w * topLeftX) / w
-                    let y = waterTop + waveAmplitude * sin(progress * waveFreq * .pi * 2)
-                    path.addLine(to: CGPoint(x: x, y: y))
-                }
+                path.addCurve(
+                    to: CGPoint(x: 0, y: waterTop),
+                    control1: CGPoint(x: w * 0.35, y: waterTop + waveAmplitude),
+                    control2: CGPoint(x: w * 0.25, y: waterTop + waveAmplitude)
+                )
 
                 path.closeSubpath()
             }
-            .fill(Color(red: 0.28, green: 0.56, blue: 0.86))
+            .fill(waterColor)
         }
     }
 }
@@ -194,7 +233,7 @@ struct WaterTrackerView: View {
     }
 
     private var activeHoursProgress: CGFloat {
-        ProductivityDataStore.shared.activeDayProgress
+        max(ProductivityDataStore.shared.activeDayProgress, 0.001)
     }
 
     var body: some View {
@@ -202,13 +241,15 @@ struct WaterTrackerView: View {
             arcTrack
             arcProgress
             innerCard
-            innerArcTrack
-            innerArcProgress
             endpointIcons
             centerText
             waterWave
             quickAddButton
             auxiliaryButton
+            innerArcTrack
+                .zIndex(1)
+            innerArcProgress
+                .zIndex(1)
         }
         .frame(width: containerSize, height: containerSize)
         .onAppear {

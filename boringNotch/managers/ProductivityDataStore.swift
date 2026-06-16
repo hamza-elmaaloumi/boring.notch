@@ -324,12 +324,13 @@ extension ProductivityDataStore {
         let currentMinutes = currentHour * 60 + currentMinute
 
         let startMinutes = startHour * 60
-        let endMinutes = endHour == 0 ? 24 * 60 : endHour * 60
+        let effectiveEndHour = endHour == 0 ? 24 : endHour
+        let endMinutes = effectiveEndHour * 60
 
         let totalDuration: Int
         let elapsed: Int
 
-        if startHour <= endHour {
+        if startMinutes <= endMinutes {
             totalDuration = endMinutes - startMinutes
             elapsed = min(max(currentMinutes - startMinutes, 0), totalDuration)
         } else {

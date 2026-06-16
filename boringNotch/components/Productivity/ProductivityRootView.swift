@@ -3,8 +3,14 @@ import SwiftUI
 struct ProductivityRootView: View {
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
-            PomodoroTimerView()
-                .frame(width: 130)
+            VStack(spacing: 8) {
+                PomodoroTimerView()
+                    .frame(width: 130)
+                IdeasNoteView()
+                    .frame(width: 130)
+            }
+            .frame(maxHeight: .infinity, alignment: .top)
+
             Divider()
             WaterTrackerView()
             WaterLogListView()

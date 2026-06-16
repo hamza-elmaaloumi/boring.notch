@@ -126,6 +126,8 @@ struct ActiveHoursSlider: View {
             }
         }
         .onAppear {
+            UserDefaults.standard.set(startHour, forKey: "reminderQuietHoursStart")
+            UserDefaults.standard.set(endHour, forKey: "reminderQuietHoursEnd")
             syncDisplayFromSlider()
         }
         .onChange(of: startHour) { _, _ in
