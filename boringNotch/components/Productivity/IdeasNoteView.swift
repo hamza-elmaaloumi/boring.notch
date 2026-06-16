@@ -15,15 +15,19 @@ struct IdeasNoteView: View {
 
             TextEditor(text: $text)
                 .scrollContentBackground(.hidden)
-                .background(Color.clear)
                 .font(.system(size: 11))
                 .foregroundColor(.white)
                 .frame(maxHeight: .infinity)
-                .padding(.horizontal, 2)
+                .padding(.horizontal, 4)
+                .padding(.vertical, 6)
         }
         .frame(maxHeight: .infinity)
         .background(Color(white: 0.08))
-        .cornerRadius(8)
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(Color(white: 0.25), lineWidth: 1)
+        )
         .padding(.bottom, 4)
     }
 }

@@ -81,9 +81,10 @@ boringNotch/
 ### 1. NEW FILES & XCODE PROJECT LINKING (CRITICAL)
 - We do not use Xcode; we compile via GitHub Actions. 
 - **Rule of Order:** NEVER reference, instantiate, or use a new class, manager, or struct (e.g., `PomodoroTimerManager`) in a View unless you have explicitly created its underlying implementation file FIRST.
-- **The Ruby Script:** IMMEDIATELY after creating ANY new `.swift` file, you MUST add its relative path to the linking script `update_prod_pbxproj.rb` (or ensure the script's dynamic scan will pick it up) AND run `ruby update_prod_pbxproj.rb` BEFORE committing or pushing.
+- **The Ruby Script:** IMMEDIATELY after creating ANY new `.swift` file, you MUST run `ruby update_prod_pbxproj.rb` BEFORE committing or pushing.
 - **Why:** If you skip running this script, the new file will not be linked to the Master List/Xcode target, and the compiler will throw a "cannot find in scope" error.
-- **The script now dynamically scans the entire `boringNotch/` directory for Swift files, so any new file placed inside `boringNotch/` will be auto-linked. If you place a file outside this directory, you must add it manually to the script.**
+- **The script dynamically scans the entire `boringNotch/` directory for Swift files, so new files inside `boringNotch/` are auto-linked. It does NOT remove files that have been deleted from disk.** If you delete a `.swift` file, its references in `project.pbxproj` must be removed manually — search for the filename in `project.pbxproj` and delete all matching lines containing its UUID.
+- If you place a file outside the `boringNotch/` directory, you must add it to the script's scan path manually.
 
 ### 2. macOS SWIFTUI RESTRICTIONS
 - Never use iOS-only SwiftUI APIs. Specifically, `editMode` (`.environment(\.editMode, ...)`) is completely unavailable on macOS targets.
