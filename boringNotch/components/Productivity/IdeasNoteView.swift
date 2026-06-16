@@ -1,8 +1,7 @@
 import SwiftUI
-import Defaults
 
 struct IdeasNoteView: View {
-    @Default(.ideasNote) private var text
+    @AppStorage("ideasNote") private var text: String = ""
 
     var body: some View {
         ZStack(alignment: .topLeading) {

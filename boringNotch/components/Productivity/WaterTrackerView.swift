@@ -210,7 +210,7 @@ struct WaterTrackerView: View {
 
     private let innerArcDiameter: CGFloat = 184
     private let innerArcSpan: CGFloat = 0.278
-    private let innerArcRotation: CGFloat = 40
+    private let innerArcRotation: CGFloat = 220
 
     private var center: CGPoint {
         CGPoint(x: containerSize / 2, y: containerSize / 2)
@@ -286,7 +286,7 @@ struct WaterTrackerView: View {
     private var innerArcTrack: some View {
         Circle()
             .trim(from: 0, to: innerArcSpan)
-            .stroke(Color.orange.opacity(0.12), style: StrokeStyle(lineWidth: 3, lineCap: .round))
+            .stroke(Color.green.opacity(0.12), style: StrokeStyle(lineWidth: 3, lineCap: .round))
             .rotationEffect(.degrees(innerArcRotation))
             .frame(width: innerArcDiameter, height: innerArcDiameter)
     }
@@ -294,7 +294,7 @@ struct WaterTrackerView: View {
     private var innerArcProgress: some View {
         Circle()
             .trim(from: 0, to: innerArcSpan * min(activeHoursProgress, 1))
-            .stroke(Color.orange, style: StrokeStyle(lineWidth: 4, lineCap: .round))
+            .stroke(Color.green, style: StrokeStyle(lineWidth: 4, lineCap: .round))
             .rotationEffect(.degrees(innerArcRotation))
             .frame(width: innerArcDiameter, height: innerArcDiameter)
             .animation(.spring(response: 0.6, dampingFraction: 0.8), value: activeHoursProgress)
