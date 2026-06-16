@@ -201,9 +201,9 @@ struct WaterTrackerView: View {
         ZStack {
             arcTrack
             arcProgress
+            innerCard
             innerArcTrack
             innerArcProgress
-            innerCard
             endpointIcons
             centerText
             waterWave
