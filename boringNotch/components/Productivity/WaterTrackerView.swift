@@ -106,7 +106,7 @@ struct TaperedGlassShape: Shape {
             path.addQuadCurve(
                 to: CGPoint(x: topLeftX, y: topRadius),
                 control: CGPoint(
-                    x: bottomLeftX + sideInset,
+                    x: sideInset,
                     y: h * 0.5
                 )
             )
@@ -209,8 +209,8 @@ struct WaterTrackerView: View {
     private let arcRotation: CGFloat = 160
 
     private let innerArcDiameter: CGFloat = 184
-    private let innerArcSpan: CGFloat = 0.278
-    private let innerArcRotation: CGFloat = 220
+    private let innerArcSpan: CGFloat = 0.347
+    private let innerArcRotation: CGFloat = 208
 
     private var center: CGPoint {
         CGPoint(x: containerSize / 2, y: containerSize / 2)

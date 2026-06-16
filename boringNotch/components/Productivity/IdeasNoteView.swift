@@ -13,13 +13,13 @@ struct IdeasNoteView: View {
                     .font(.system(size: 11))
             }
 
-            TextEditor(text: $text)
-                .scrollContentBackground(.hidden)
-                .background(Color.clear)
-                .font(.system(size: 11))
-                .foregroundColor(.white)
-                .frame(maxHeight: .infinity)
-                .padding(.horizontal, 2)
+            NotchTextView(
+                text: $text,
+                textColor: NSColor.white,
+                font: NSFont.systemFont(ofSize: 11)
+            )
+            .frame(maxHeight: .infinity)
+            .padding(.horizontal, 2)
         }
         .frame(maxHeight: .infinity)
         .background(Color(white: 0.08))
