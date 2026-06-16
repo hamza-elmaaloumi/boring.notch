@@ -7,7 +7,7 @@ struct NotchTextView: NSViewRepresentable {
     var font: NSFont = .systemFont(ofSize: 11)
 
     func makeNSView(context: Context) -> NSTextView {
-        let textView = NotchNSTextView()
+        let textView = NotchNSTextView(frame: .zero)
         textView.isEditable = true
         textView.isSelectable = true
         textView.isRichText = false
@@ -46,6 +46,14 @@ struct NotchTextView: NSViewRepresentable {
 }
 
 private class NotchNSTextView: NSTextView {
+    override init(frame: NSRect) {
+        super.init(frame: frame)
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+    }
+
     override var acceptsFirstResponder: Bool { true }
 
     override func becomeFirstResponder() -> Bool {
@@ -64,7 +72,7 @@ private class NotchNSTextView: NSTextView {
         return result
     }
 
-    override var acceptsFirstMouse(for event: NSEvent?) -> Bool {
+    override func acceptsFirstMouse(for event: NSEvent?) -> Bool {
         true
     }
 }
