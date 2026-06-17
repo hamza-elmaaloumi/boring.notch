@@ -176,7 +176,6 @@ struct TaperedGlassIcon: View {
 }
 
 struct WaterTrackerView: View {
-    @AppStorage("waterConsumed") private var waterConsumed: Int = 0
     @AppStorage("waterGoal") private var waterGoal: Int = 2000
 
     @Default(.selectedCupIndex) var selectedCupIndex
@@ -187,6 +186,9 @@ struct WaterTrackerView: View {
 
     @State private var showCupPicker = false
     @EnvironmentObject var vm: BoringViewModel
+    @ObservedObject private var dataStore = ProductivityDataStore.shared
+
+    private var waterConsumed: Int { dataStore.waterConsumedToday() }
 
     private let containerSize: CGFloat = 300
     private let arcDiameter: CGFloat = 236
@@ -419,7 +421,7 @@ struct WaterTrackerView: View {
 
     private func updateGoalIfNeeded() {
         if autoCalculateWaterGoal {
-            let newGoal = ProductivityDataStore.shared.calculateWaterGoal(height: userHeight, weight: userWeight)
+            let newGoal = ProductivityDataStore.shared.calculateWaterGoal(weight: userWeight)
             if waterGoal != newGoal {
                 waterGoal = newGoal
             }
@@ -430,9 +432,6 @@ struct WaterTrackerView: View {
         AudioPlayer().play(fileName: "water_stream", fileExtension: "caf", duration: 1)
 
         let increment = currentCup.amount
-        withAnimation(.spring(response: 0.42, dampingFraction: 0.82)) {
-            waterConsumed += increment
-        }
 
         let isDuringFocus = PomodoroTimerStore.shared.isRunning && PomodoroTimerStore.shared.currentMode == .focus
         let log = WaterLogEntry(

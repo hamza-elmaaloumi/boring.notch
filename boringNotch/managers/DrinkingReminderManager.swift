@@ -37,11 +37,6 @@ class DrinkingReminderManager: ObservableObject {
             .store(in: &cancellables)
     }
     
-    func recalculateInterval(dailyGoal: Int, increment: Int) {
-        guard dailyGoal > 0, increment > 0 else { return }
-        intervalMinutes = max(15, (16 * 60 * increment) / dailyGoal)
-    }
-    
     private func start() {
         guard isEnabled else { return }
         scheduleTimer()
@@ -79,7 +74,9 @@ class DrinkingReminderManager: ObservableObject {
         let quietStart = Defaults[.reminderQuietHoursStart]
         let quietEnd = Defaults[.reminderQuietHoursEnd]
         let currentHour = Calendar.current.component(.hour, from: Date())
-        
+
+        guard quietStart != quietEnd else { return }
+
         if quietStart < quietEnd {
             guard currentHour >= quietStart && currentHour < quietEnd else { return }
         } else {

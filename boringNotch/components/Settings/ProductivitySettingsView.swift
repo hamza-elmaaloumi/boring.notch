@@ -172,7 +172,7 @@ struct ProductivitySettingsContent: View {
 
     private func updateGoal() {
         if autoCalculateWaterGoal {
-            waterGoal = ProductivityDataStore.shared.calculateWaterGoal(height: userHeight, weight: userWeight)
+            waterGoal = ProductivityDataStore.shared.calculateWaterGoal(weight: userWeight)
         }
     }
 }

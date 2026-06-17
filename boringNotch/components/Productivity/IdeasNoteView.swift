@@ -7,27 +7,21 @@ struct IdeasNoteView: View {
         ZStack(alignment: .topLeading) {
             if text.isEmpty {
                 Text("Write your ideas...")
-                    .foregroundColor(Color(white: 0.4))
+                    .foregroundColor(.red.opacity(0.5))
                     .padding(.horizontal, 4)
                     .padding(.vertical, 6)
-                    .font(.system(size: 11))
+                    .font(.system(size: 11, design: .monospaced))
             }
 
             TextEditor(text: $text)
                 .scrollContentBackground(.hidden)
-                .font(.system(size: 11))
-                .foregroundColor(.white)
+                .font(.system(size: 11, design: .monospaced))
+                .foregroundColor(.red)
                 .frame(maxHeight: .infinity)
                 .padding(.horizontal, 4)
                 .padding(.vertical, 6)
         }
         .frame(maxHeight: .infinity)
-        .background(Color(white: 0.08))
-        .clipShape(RoundedRectangle(cornerRadius: 8))
-        .overlay(
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(Color(white: 0.25), lineWidth: 1)
-        )
         .padding(.bottom, 4)
     }
 }

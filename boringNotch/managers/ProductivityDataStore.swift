@@ -19,6 +19,7 @@ class ProductivityDataStore: ObservableObject {
     private init() {
         loadFocusSessions()
         loadWaterLogs()
+        pruneOldWaterLogs()
         migrateOldWaterData()
         checkDailyReset()
         scheduleMidnightReset()
@@ -45,12 +46,20 @@ class ProductivityDataStore: ObservableObject {
         }
     }
     
+    private func pruneOldWaterLogs() {
+        let cutoff = Calendar.current.date(byAdding: .day, value: -90, to: Date())!
+        waterLogs.removeAll { $0.date < cutoff }
+        saveWaterLogs()
+    }
+
     private func migrateOldWaterData() {
         guard !UserDefaults.standard.bool(forKey: migratedKey) else { return }
         let oldWater = UserDefaults.standard.integer(forKey: "waterConsumed")
         if oldWater > 0 {
+            let storedDate = UserDefaults.standard.object(forKey: lastResetDateKey) as? Date
+            let logDate = storedDate ?? Calendar.current.date(byAdding: .day, value: -1, to: Date()) ?? Date()
             let log = WaterLogEntry(
-                date: Date(),
+                date: logDate,
                 amountMl: oldWater,
                 wasDuringFocus: false,
                 focusSessionId: nil
@@ -75,16 +84,15 @@ class ProductivityDataStore: ObservableObject {
     }
     
     private func performDailyReset() {
-        UserDefaults.standard.set(0, forKey: "waterConsumed")
         UserDefaults.standard.set(Calendar.current.startOfDay(for: Date()), forKey: lastResetDateKey)
         
         if Defaults[.autoCalculateWaterGoal] {
-            let goal = calculateWaterGoal(height: Defaults[.userHeight], weight: Defaults[.userWeight])
+            let goal = calculateWaterGoal(weight: Defaults[.userWeight])
             Defaults[.waterGoal] = goal
         }
     }
-    
-    func calculateWaterGoal(height: Double, weight: Double) -> Int {
+
+    func calculateWaterGoal(weight: Double) -> Int {
         let total = Int(weight * 35)
         return max(1000, min(5000, total))
     }
