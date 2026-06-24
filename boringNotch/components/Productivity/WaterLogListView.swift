@@ -3,14 +3,8 @@ import SwiftUI
 struct WaterLogListView: View {
     @ObservedObject var store: ProductivityDataStore = .shared
 
-    private static let timeFormatter: DateFormatter = {
-        let f = DateFormatter()
-        f.dateFormat = "HH:mm"
-        return f
-    }()
-
     private func formattedTime(_ date: Date) -> String {
-        Self.timeFormatter.string(from: date).lowercased()
+        date.formatted(date: .omitted, time: .shortened)
     }
 
     private var todayLogs: [WaterLogEntry] {

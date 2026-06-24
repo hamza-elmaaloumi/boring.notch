@@ -29,6 +29,7 @@ final class PomodoroTimerStore: ObservableObject {
 
     private var timer: Timer?
     private var deadline: Date?
+    private var sleepObserver: Any?
     private var focusDuration: Int = 25 * 60
     private var shortBreakDuration: Int = 5 * 60
     private var longBreakDuration: Int = 15 * 60
@@ -81,6 +82,15 @@ final class PomodoroTimerStore: ObservableObject {
                     ProductivityDataStore.shared.saveFocusSession(session)
                 }
             }
+        }
+
+        let workspaceNC = NSWorkspace.shared.notificationCenter
+        sleepObserver = workspaceNC.addObserver(
+            forName: NSWorkspace.willSleepNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.pauseTimer()
         }
     }
 
@@ -165,8 +175,6 @@ final class PomodoroTimerStore: ObservableObject {
 
         if isRunning {
             updateRemainingTime()
-        } else if deadline == nil && !hasActiveSession {
-            timeRemaining = duration(for: currentMode)
         } else if deadline != nil {
             updateRemainingTime()
         }
@@ -221,6 +229,8 @@ final class PomodoroTimerStore: ObservableObject {
         timer = nil
         isRunning = false
         deadline = nil
+        hasActiveSession = false
+        currentSessionId = nil
     }
 
     private func scheduleTimer() {
@@ -233,12 +243,7 @@ final class PomodoroTimerStore: ObservableObject {
     }
 
     private func updateRemainingTime() {
-        guard let deadline = deadline else {
-            if !isRunning && !hasActiveSession {
-                timeRemaining = duration(for: currentMode)
-            }
-            return
-        }
+        guard let deadline = deadline else { return }
 
         let nextRemaining = max(0, Int(ceil(deadline.timeIntervalSinceNow)))
         timeRemaining = nextRemaining
@@ -251,13 +256,11 @@ final class PomodoroTimerStore: ObservableObject {
     private func completeTimer() {
         guard isRunning || deadline != nil else { return }
 
-        let wasRunning = isRunning
-
         if currentMode == .focus, let start = sessionStartDate {
             let session = FocusSession(
                 startDate: start,
                 endDate: Date(),
-                durationSeconds: duration(for: currentMode),
+                durationSeconds: Int(Date().timeIntervalSince(start)),
                 mode: currentMode.rawValue,
                 completed: true
             )
@@ -275,23 +278,21 @@ final class PomodoroTimerStore: ObservableObject {
         sessionStartDate = nil
         clearPersistedState()
 
-        if wasRunning {
-            NSSound(named: "Glass")?.play()
-            NSApp.requestUserAttention(.criticalRequest)
+        NSSound(named: "Glass")?.play()
+        NSApp.requestUserAttention(.criticalRequest)
 
-            NotificationCenter.default.post(name: .pomodoroTimerDidFinish, object: currentMode.rawValue)
+        NotificationCenter.default.post(name: .pomodoroTimerDidFinish, object: currentMode.rawValue)
 
-            let next = nextMode()
-            currentMode = next
-            hasCompleted = false
-            timeRemaining = duration(for: next)
+        let next = nextMode()
+        currentMode = next
+        hasCompleted = false
+        timeRemaining = duration(for: next)
 
-            if next == .longBreak {
-                consecutiveFocusSessions = 0
-            }
-
-            startTimer()
+        if next == .longBreak {
+            consecutiveFocusSessions = 0
         }
+
+        startTimer()
     }
 
     private func nextMode() -> Mode {
@@ -338,9 +339,6 @@ final class PomodoroTimerStore: ObservableObject {
 
         if let start = state.sessionStartDate, Date().timeIntervalSince(start) <= 300 {
             sessionStartDate = start
-        } else {
-            hasActiveSession = false
-            currentSessionId = nil
         }
 
         clearPersistedState()

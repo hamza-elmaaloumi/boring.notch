@@ -13,14 +13,18 @@ class ProductivityDataStore: ObservableObject {
     private let waterLogsKey = "water_logs"
     private let lastResetDateKey = "last_water_reset_date"
     private let migratedKey = "hasMigratedWaterData"
+    private let schemaVersionKey = "productivity_data_schema_version"
+    private let currentSchemaVersion = 1
     
     private var midnightTimer: Timer?
     
     private init() {
         loadFocusSessions()
+        pruneOldFocusSessions()
         loadWaterLogs()
         pruneOldWaterLogs()
         migrateOldWaterData()
+        checkSchemaMigration()
         checkDailyReset()
         scheduleMidnightReset()
     }
@@ -46,6 +50,15 @@ class ProductivityDataStore: ObservableObject {
         }
     }
     
+    private func pruneOldFocusSessions() {
+        let cutoff = Calendar.current.date(byAdding: .day, value: -365, to: Date())!
+        let beforeCount = focusSessions.count
+        focusSessions.removeAll { $0.startDate < cutoff }
+        if focusSessions.count != beforeCount {
+            saveFocusSessions()
+        }
+    }
+
     private func pruneOldWaterLogs() {
         let cutoff = Calendar.current.date(byAdding: .day, value: -90, to: Date())!
         waterLogs.removeAll { $0.date < cutoff }
@@ -70,6 +83,13 @@ class ProductivityDataStore: ObservableObject {
         UserDefaults.standard.set(true, forKey: migratedKey)
     }
     
+    private func checkSchemaMigration() {
+        let storedVersion = UserDefaults.standard.integer(forKey: schemaVersionKey)
+        guard storedVersion < currentSchemaVersion else { return }
+        saveAll()
+        UserDefaults.standard.set(currentSchemaVersion, forKey: schemaVersionKey)
+    }
+
     func checkDailyReset() {
         let storedDate = UserDefaults.standard.object(forKey: lastResetDateKey) as? Date
         let today = Calendar.current.startOfDay(for: Date())
