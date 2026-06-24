@@ -70,14 +70,16 @@ final class PomodoroTimerStore: ObservableObject {
             if self.hasActiveSession && self.currentMode == .focus {
                 let now = Date()
                 let actualDuration = Int(now.timeIntervalSince(self.sessionStartDate ?? now))
-                let session = FocusSession(
-                    startDate: self.sessionStartDate ?? now,
-                    endDate: now,
-                    durationSeconds: actualDuration,
-                    mode: self.currentMode.rawValue,
-                    completed: false
-                )
-                ProductivityDataStore.shared.saveFocusSession(session)
+                if actualDuration > 0 {
+                    let session = FocusSession(
+                        startDate: self.sessionStartDate ?? now,
+                        endDate: now,
+                        durationSeconds: actualDuration,
+                        mode: self.currentMode.rawValue,
+                        completed: false
+                    )
+                    ProductivityDataStore.shared.saveFocusSession(session)
+                }
             }
         }
     }
@@ -91,6 +93,28 @@ final class PomodoroTimerStore: ObservableObject {
 
     func selectMode(_ mode: Mode) {
         guard currentMode != mode else { return }
+
+        if currentMode == .focus {
+            if isRunning {
+                pauseTimer()
+            } else if hasActiveSession, let start = sessionStartDate {
+                let actualDuration = Int(Date().timeIntervalSince(start))
+                if actualDuration > 0 {
+                    let session = FocusSession(
+                        startDate: start,
+                        endDate: Date(),
+                        durationSeconds: actualDuration,
+                        mode: currentMode.rawValue,
+                        completed: false
+                    )
+                    ProductivityDataStore.shared.saveFocusSession(session)
+                }
+                sessionStartDate = nil
+                currentSessionId = nil
+                hasActiveSession = false
+            }
+        }
+
         currentMode = mode
         hasCompleted = false
         resetTimer()
@@ -190,6 +214,7 @@ final class PomodoroTimerStore: ObservableObject {
                 )
                 ProductivityDataStore.shared.saveFocusSession(session)
             }
+            sessionStartDate = nil
         }
 
         timer?.invalidate()
@@ -226,6 +251,8 @@ final class PomodoroTimerStore: ObservableObject {
     private func completeTimer() {
         guard isRunning || deadline != nil else { return }
 
+        let wasRunning = isRunning
+
         if currentMode == .focus, let start = sessionStartDate {
             let session = FocusSession(
                 startDate: start,
@@ -248,21 +275,23 @@ final class PomodoroTimerStore: ObservableObject {
         sessionStartDate = nil
         clearPersistedState()
 
-        NSSound(named: "Glass")?.play()
-        NSApp.requestUserAttention(.criticalRequest)
+        if wasRunning {
+            NSSound(named: "Glass")?.play()
+            NSApp.requestUserAttention(.criticalRequest)
 
-        NotificationCenter.default.post(name: .pomodoroTimerDidFinish, object: currentMode.rawValue)
+            NotificationCenter.default.post(name: .pomodoroTimerDidFinish, object: currentMode.rawValue)
 
-        let next = nextMode()
-        currentMode = next
-        hasCompleted = false
-        timeRemaining = duration(for: next)
+            let next = nextMode()
+            currentMode = next
+            hasCompleted = false
+            timeRemaining = duration(for: next)
 
-        if next == .longBreak {
-            consecutiveFocusSessions = 0
+            if next == .longBreak {
+                consecutiveFocusSessions = 0
+            }
+
+            startTimer()
         }
-
-        startTimer()
     }
 
     private func nextMode() -> Mode {
@@ -306,7 +335,13 @@ final class PomodoroTimerStore: ObservableObject {
         if let sessionIdStr = state.currentSessionId, let uuid = UUID(uuidString: sessionIdStr) {
             currentSessionId = uuid
         }
-        sessionStartDate = state.sessionStartDate
+
+        if let start = state.sessionStartDate, Date().timeIntervalSince(start) <= 300 {
+            sessionStartDate = start
+        } else {
+            hasActiveSession = false
+            currentSessionId = nil
+        }
 
         clearPersistedState()
     }
