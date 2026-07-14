@@ -69,3 +69,9 @@ enum SliderColorEnum: String, CaseIterable, Defaults.Serializable {
     case albumArt = "Match album art"
     case accent = "Accent color"
 }
+
+enum PomodoroNotchPresence: String, CaseIterable, Defaults.Serializable {
+    case both = "Both"
+    case hidden = "Hidden"
+    case timerOnly = "Timer only"
+}

@@ -16,7 +16,7 @@ struct NotchContentView: View {
     @ObservedObject var volumeManager = VolumeManager.shared
 
     @Default(.useMusicVisualizer) var useMusicVisualizer
-    @Default(.showNotHumanFace) var showNotHumanFace
+    @Default(.pomodoroNotchPresence) var pomodoroNotchPresence
 
     private var timeRemainingText: String {
         let minutes = pomodoroTimerStore.timeRemaining / 60
@@ -77,10 +77,14 @@ struct NotchContentView: View {
                     } else if (!coordinator.expandingView.show || coordinator.expandingView.type == .music) && vm.notchState == .closed && (musicManager.isPlaying || !musicManager.isPlayerIdle) && coordinator.musicLiveActivityEnabled && !vm.hideOnClosed {
                         MusicLiveActivityView(albumArtNamespace: albumArtNamespace, gestureProgress: $gestureProgress)
                             .frame(alignment: .center)
-                    } else if !coordinator.expandingView.show && vm.notchState == .closed && (!musicManager.isPlaying && musicManager.isPlayerIdle) && (!vm.hideOnClosed || (Defaults[.showPomodoroTimerInNotch] && pomodoroTimerStore.showsTimeInNotch)) {
+                    } else if !coordinator.expandingView.show && vm.notchState == .closed
+                        && (!musicManager.isPlaying && musicManager.isPlayerIdle)
+                        && (pomodoroNotchPresence == .both)
+                        && (!vm.hideOnClosed || pomodoroNotchPresence == .both)
+                    {
                         BoringFaceAnimationView(
-                            timerText: (Defaults[.showPomodoroTimerInNotch] && pomodoroTimerStore.showsTimeInNotch) ? timeRemainingText : nil,
-                            showFace: Defaults[.showNotHumanFace],
+                            timerText: (pomodoroTimerStore.showsTimeInNotch) ? timeRemainingText : nil,
+                            showFace: true,
                             timerColor: pomodoroTimerColor
                         )
                     } else if vm.notchState == .open {

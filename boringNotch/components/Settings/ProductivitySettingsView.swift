@@ -35,6 +35,7 @@ struct ProductivitySettingsContent: View {
     @AppStorage("dailyFocusGoalMinutes") private var dailyFocusGoal: Int = 120
     @AppStorage("drinkingReminderInterval") private var reminderInterval: Int = 96
     @Default(.allowRemindersDuringFocus) var allowDuringFocus
+    @Default(.pomodoroNotchPresence) var pomodoroNotchPresence
 
     @Default(.userHeight) var userHeight
     @Default(.userWeight) var userWeight
@@ -83,13 +84,12 @@ struct ProductivitySettingsContent: View {
 
             Divider()
 
-            Defaults.Toggle(key: .showPomodoroTimerInNotch) {
-                Text("Show timer in notch when active")
+            Picker("Notch Pomodoro display", selection: $pomodoroNotchPresence) {
+                Text("Timer & Face").tag(PomodoroNotchPresence.both)
+                Text("Hidden").tag(PomodoroNotchPresence.hidden)
+                Text("Timer outline").tag(PomodoroNotchPresence.timerOnly)
             }
-
-            Defaults.Toggle(key: .showNotHumanFace) {
-                Text("Show face animation in notch")
-            }
+            .pickerStyle(.segmented)
         }
         .padding()
         .background(Color(nsColor: .controlBackgroundColor))

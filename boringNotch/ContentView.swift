@@ -50,6 +50,12 @@ struct ContentView: View {
         )
     }
 
+    private var showsIdlePomodoroContent: Bool {
+        !coordinator.expandingView.show
+            && vm.notchState == .closed
+            && (!musicManager.isPlaying && musicManager.isPlayerIdle)
+    }
+
     private var computedChinWidth: CGFloat {
         var chinWidth: CGFloat = vm.closedNotchSize.width
 
@@ -62,15 +68,19 @@ struct ContentView: View {
             && coordinator.musicLiveActivityEnabled && !vm.hideOnClosed
         {
             chinWidth += (2 * max(0, vm.effectiveClosedNotchHeight - 12) + 20)
-        } else if !coordinator.expandingView.show && vm.notchState == .closed
-            && (!musicManager.isPlaying && musicManager.isPlayerIdle)
-            && (Defaults[.showNotHumanFace] || (Defaults[.showPomodoroTimerInNotch] && pomodoroTimerStore.showsTimeInNotch))
-            && (!vm.hideOnClosed || (Defaults[.showPomodoroTimerInNotch] && pomodoroTimerStore.showsTimeInNotch))
+        } else if showsIdlePomodoroContent
+            && Defaults[.pomodoroNotchPresence] == .both
         {
             chinWidth += (2 * max(0, vm.effectiveClosedNotchHeight - 12) + 20)
         }
 
         return chinWidth
+    }
+
+    private var pomodoroOutlineColor: Color {
+        if pomodoroTimerStore.timeRemaining <= 60 { return .red }
+        if pomodoroTimerStore.timeRemaining <= 180 { return .orange }
+        return .green
     }
 
     var body: some View {
@@ -104,6 +114,18 @@ struct ContentView: View {
                         .fill(.black)
                         .frame(height: 1)
                         .padding(.horizontal, topCornerRadius)
+                }
+                .overlay(alignment: .top) {
+                    if vm.notchState == .closed
+                        && showsIdlePomodoroContent
+                        && !coordinator.sneakPeek.show
+                        && Defaults[.pomodoroNotchPresence] == .timerOnly
+                        && pomodoroTimerStore.isRunning
+                    {
+                        currentNotchShape
+                            .stroke(pomodoroOutlineColor, lineWidth: 2)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    }
                 }
                 .shadow(
                     color: ((vm.notchState == .open || isHovering) && Defaults[.enableShadow])
