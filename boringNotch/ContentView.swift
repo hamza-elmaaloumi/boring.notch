@@ -123,7 +123,7 @@ struct ContentView: View {
                         && pomodoroTimerStore.isRunning
                     {
                         currentNotchShape
-                            .stroke(pomodoroOutlineColor, lineWidth: 2)
+                            .stroke(pomodoroOutlineColor, lineWidth: 4)
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
                 }
