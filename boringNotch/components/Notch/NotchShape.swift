@@ -119,6 +119,46 @@ struct NotchShape: Shape {
     }
 }
 
+struct NotchOutlineShape: Shape {
+    private var topCornerRadius: CGFloat
+    private var bottomCornerRadius: CGFloat
+
+    init(topCornerRadius: CGFloat? = nil, bottomCornerRadius: CGFloat? = nil) {
+        self.topCornerRadius = topCornerRadius ?? 6
+        self.bottomCornerRadius = bottomCornerRadius ?? 14
+    }
+
+    var animatableData: AnimatablePair<CGFloat, CGFloat> {
+        get { .init(topCornerRadius, bottomCornerRadius) }
+        set { topCornerRadius = newValue.first; bottomCornerRadius = newValue.second }
+    }
+
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        let top = rect.minY + topCornerRadius
+        let leftX = rect.minX + topCornerRadius
+        let rightX = rect.maxX - topCornerRadius
+        let bottomY = rect.maxY
+        let bottomLeftY = bottomY - bottomCornerRadius
+        let bottomLeftX = rect.minX + topCornerRadius + bottomCornerRadius
+        let bottomRightX = rect.maxX - topCornerRadius - bottomCornerRadius
+
+        path.move(to: CGPoint(x: leftX, y: top))
+        path.addLine(to: CGPoint(x: leftX, y: bottomLeftY))
+        path.addQuadCurve(
+            to: CGPoint(x: bottomLeftX, y: bottomY),
+            control: CGPoint(x: leftX, y: bottomY)
+        )
+        path.addLine(to: CGPoint(x: bottomRightX, y: bottomY))
+        path.addQuadCurve(
+            to: CGPoint(x: rightX, y: bottomLeftY),
+            control: CGPoint(x: rightX, y: bottomY)
+        )
+        path.addLine(to: CGPoint(x: rightX, y: top))
+        return path
+    }
+}
+
 #Preview {
     NotchShape(topCornerRadius: 6, bottomCornerRadius: 14)
         .frame(width: 200, height: 32)

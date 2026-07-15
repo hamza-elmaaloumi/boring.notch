@@ -122,7 +122,10 @@ struct ContentView: View {
                         && Defaults[.pomodoroNotchPresence] == .timerOnly
                         && pomodoroTimerStore.isRunning
                     {
-                        currentNotchShape
+                        NotchOutlineShape(
+                            topCornerRadius: topCornerRadius,
+                            bottomCornerRadius: cornerRadiusInsets.closed.bottom
+                        )
                             .stroke(pomodoroOutlineColor, lineWidth: 4)
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
